@@ -1,0 +1,54 @@
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>
+            <span class="brand-icon" style="width:28px;height:28px;font-size:0.9rem;">CS</span>
+            ClubSphere
+          </h3>
+          <p style="font-size: 0.85rem; color: #9ca3af; margin-bottom: 0.75rem;">
+            A centralized platform for club discovery, recruitment drives, event registrations, and campus governance.
+          </p>
+          <span style="font-size: 0.72rem; background: rgba(99,102,241,.15); color: #a5b4fc; padding: 3px 8px; border-radius: 4px; font-weight: 600;">
+            WAD Project
+          </span>
+        </div>
+
+        <div class="footer-links">
+          <h4>Explore</h4>
+          <ul>
+            <li><a href="/clubs">All Clubs</a></li>
+            <li><a href="/clubs?category=Technical">Technical Clubs</a></li>
+            <li><a href="/clubs?category=Cultural">Cultural Clubs</a></li>
+            <li><a href="/events">Upcoming Events</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links">
+          <h4>User Roles</h4>
+          <ul>
+            <li><a href="/auth/login?role=student">Student Login</a></li>
+            <li><a href="/auth/login?role=secretary">Secretary Portal</a></li>
+            <li><a href="/auth/login?role=core">Core Member</a></li>
+            <li><a href="/auth/login?role=faculty">Faculty Advisor</a></li>
+            <li><a href="/auth/login?role=admin">Administrator</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links">
+          <h4>About</h4>
+          <p style="font-size: 0.8rem; color: #9ca3af; line-height: 1.5;">
+            Built with Node.js, Express, MongoDB & EJS. A single web portal that replaces scattered WhatsApp groups and Instagram pages for club activities.
+          </p>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; <%= new Date().getFullYear() %> ClubSphere &bull; Club Discovery & Recruitment Platform</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/main.js"></script>
+</body>
+</html>

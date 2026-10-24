@@ -1,0 +1,137 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">⚡ Recruitment Announcements</h1>
+      <p class="section-subtitle">Manage recruitment drives for <%= club.name %> (Requires Faculty Advisor Approval)</p>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('createRecruitmentModal')">
+      + Post New Recruitment Drive
+    </button>
+  </div>
+
+  <% if (recruitments.length === 0) { %>
+    <div style="text-align: center; padding: 4rem 1rem; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <h3 style="color: var(--primary); font-size: 1.35rem; margin-bottom: 0.5rem;">No recruitment drives created yet</h3>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Create your first drive to start accepting student applications!</p>
+      <button class="btn btn-primary" onclick="openModal('createRecruitmentModal')">+ Post New Drive</button>
+    </div>
+  <% } else { %>
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <% recruitments.forEach(rec => { %>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <span class="badge <%= rec.status === 'Open' ? 'badge-open' : (rec.status === 'Pending Approval' ? 'badge-coming-soon' : 'badge-closed') %>">
+                <%= rec.status %>
+              </span>
+              <h2 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-top: 0.25rem;">
+                <%= rec.title %>
+              </h2>
+            </div>
+            <div style="text-align: right; font-size: 0.85rem; color: var(--text-muted);">
+              <div>Academic Year: <strong><%= rec.academicYear %></strong></div>
+              <div>Deadline: <strong><%= new Date(rec.deadline).toLocaleDateString() %></strong></div>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div style="margin-bottom: 1rem;">
+              <strong style="font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase;">Roles & Vacancies:</strong>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 0.4rem;">
+                <% rec.roles.forEach(role => { %>
+                  <span style="background: #f1f5f9; border: 1px solid var(--border-color); font-size: 0.825rem; padding: 4px 10px; border-radius: 4px;">
+                    <strong><%= role.roleName %></strong> (<%= role.vacancies %> seats)
+                  </span>
+                <% }) %>
+              </div>
+            </div>
+
+            <!-- Faculty Approval Box -->
+            <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 0.75rem 1rem; font-size: 0.85rem;">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span>👨‍🏫 <strong>Faculty Advisor Status:</strong></span>
+                <span class="badge <%= rec.facultyApproval.status === 'Approved' ? 'badge-open' : (rec.facultyApproval.status === 'Pending' ? 'badge-coming-soon' : 'badge-rejected') %>">
+                  <%= rec.facultyApproval.status %>
+                </span>
+              </div>
+              <% if (rec.facultyApproval.remarks) { %>
+                <div style="margin-top: 0.35rem; color: #475569;">
+                  Remarks: <em>"<%= rec.facultyApproval.remarks %>"</em>
+                </div>
+              <% } %>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <span style="font-size: 0.825rem; color: var(--text-muted);">
+              Eligibility: <%= rec.eligibility %>
+            </span>
+            <a href="/secretary/applications?role=All" class="btn btn-sm btn-primary">
+              View Applicants &rarr;
+            </a>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+
+  <!-- Modal: Post New Recruitment Drive -->
+  <div class="modal-overlay" id="createRecruitmentModal">
+    <div class="modal-box" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Post New Recruitment Announcement</h3>
+        <button class="modal-close" onclick="closeModal('createRecruitmentModal')">✕</button>
+      </div>
+      <form action="/secretary/recruitments" method="POST">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="recTitle">Recruitment Drive Title *</label>
+            <input type="text" id="recTitle" name="title" class="form-control" placeholder="e.g. Executive Committee Recruitment 2026" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="academicYear">Academic Year</label>
+              <input type="text" id="academicYear" name="academicYear" class="form-control" value="2025-2026" required>
+            </div>
+            <div class="form-group">
+              <label for="deadline">Application Deadline *</label>
+              <input type="date" id="deadline" name="deadline" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="eligibility">Student Eligibility</label>
+            <input type="text" id="eligibility" name="eligibility" class="form-control" value="Open to 1st, 2nd & 3rd Year BE/B.Tech, MCA, MSc students" required>
+          </div>
+
+          <div class="form-group">
+            <label for="rolesText">Roles Available (Format: Role Name | Vacancies | Requirements)</label>
+            <textarea id="rolesText" name="rolesText" class="form-control" style="min-height: 90px;" placeholder="Full-Stack Web Developer | 3 | Node.js, MongoDB knowledge&#10;UI/UX Designer | 2 | Figma and creative skills&#10;Event Coordinator | 4 | Good communication & management"></textarea>
+            <small class="form-text">Enter one role per line separated by pipe (|)</small>
+          </div>
+
+          <div class="form-group">
+            <label for="instructions">Instructions for Applicants</label>
+            <textarea id="instructions" name="instructions" class="form-control" placeholder="Specific guidelines or interview details..."></textarea>
+          </div>
+
+          <div style="background: #eff6ff; border-left: 4px solid var(--secondary); padding: 0.75rem; border-radius: var(--radius-sm); font-size: 0.8rem; color: #1e3a8a;">
+            ℹ️ Note: Per ClubSphere guidelines, after you submit this recruitment announcement, it is automatically routed to your <strong>Faculty Advisor (<%= club.facultyAdvisor.name %>)</strong> for review and approval before becoming public to students.
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('createRecruitmentModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Submit for Faculty Approval &rarr;</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,71 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">📋 Recruitment Applications Screening</h1>
+      <p class="section-subtitle">Collaborative applicant evaluation for <%= club.name %> Core Team</p>
+    </div>
+    <a href="/core/dashboard" class="btn btn-outline">&larr; Back to Dashboard</a>
+  </div>
+
+  <% if (applications.length === 0) { %>
+    <div style="text-align: center; padding: 4rem 1rem; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <h3 style="color: var(--primary); font-size: 1.35rem; margin-bottom: 0.5rem;">No applications received yet</h3>
+      <p style="color: var(--text-muted);">Applications submitted by students will appear here for team review.</p>
+    </div>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Student Name</th>
+            <th>Roll No & Dept</th>
+            <th>Target Role</th>
+            <th>CGPA</th>
+            <th>Skills & Competencies</th>
+            <th>Status</th>
+            <th>Why Join / SOP</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% applications.forEach(app => { %>
+            <tr>
+              <td>
+                <strong style="color: var(--primary);"><%= app.studentName %></strong>
+                <div style="font-size: 0.78rem; color: var(--text-muted);"><%= app.email %></div>
+              </td>
+              <td>
+                <strong><%= app.rollNo %></strong>
+                <div style="font-size: 0.78rem; color: var(--text-muted);"><%= app.department %></div>
+              </td>
+              <td><strong><%= app.appliedRole %></strong></td>
+              <td><strong style="color: #047857;"><%= app.cgpa || 'N/A' %></strong></td>
+              <td style="max-width: 200px; font-size: 0.825rem; color: #475569;">
+                <%= app.skills %>
+              </td>
+              <td>
+                <% if (app.status === 'Submitted') { %>
+                  <span class="badge badge-submitted">Submitted</span>
+                <% } else if (app.status === 'Shortlisted') { %>
+                  <span class="badge badge-shortlisted">Shortlisted</span>
+                <% } else if (app.status === 'Accepted') { %>
+                  <span class="badge badge-accepted">Accepted</span>
+                <% } else { %>
+                  <span class="badge badge-rejected">Rejected</span>
+                <% } %>
+              </td>
+              <td style="max-width: 220px; font-size: 0.8rem; color: #64748b; font-style: italic;">
+                "<%= app.whyJoin.length > 70 ? app.whyJoin.substring(0, 70) + '...' : app.whyJoin %>"
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</main>
+
+<%- include('../partials/footer') %>

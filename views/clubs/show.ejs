@@ -1,0 +1,233 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <!-- Club Header Profile Card -->
+  <div class="card" style="margin-bottom: 2rem; border-top: 4px solid var(--primary);">
+    <div class="card-body" style="padding: 2rem;">
+      <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+        <div>
+          <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 0.5rem;">
+            <span class="badge badge-category"><%= club.category %></span>
+            <span style="font-size: 0.75rem; font-weight: 700; background: #e2e8f0; padding: 2px 8px; border-radius: 4px;">
+              <%= club.code %>
+            </span>
+            <% if (club.recruitmentStatus === 'Open') { %>
+              <span class="badge badge-open">Recruitment Open</span>
+            <% } else { %>
+              <span class="badge badge-closed">Recruitment Closed</span>
+            <% } %>
+          </div>
+          <h1 style="font-size: 2.25rem; font-weight: 800; color: var(--primary); margin-bottom: 0.4rem;">
+            <%= club.name %>
+          </h1>
+          <p style="font-size: 1.1rem; color: var(--text-muted); max-width: 800px;">
+            <%= club.tagline %>
+          </p>
+        </div>
+
+        <div style="display: flex; gap: 0.75rem; align-items: center;">
+          <% if (user && user.role === 'student') { %>
+            <form action="/clubs/<%= club._id %>/save" method="POST">
+              <button type="submit" class="btn <%= isSaved ? 'btn-accent' : 'btn-outline' %>">
+                <%= isSaved ? '★ Saved to Dashboard' : '☆ Save Club' %>
+              </button>
+            </form>
+          <% } %>
+          <a href="/clubs" class="btn btn-outline">&larr; Back to Clubs</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="grid-template-columns: 2fr 1fr; align-items: start;">
+    <!-- Left Column: Details, Objectives, Drives & Events -->
+    <div>
+      <!-- Club Description & Objectives Module -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <h3 style="font-size: 1.15rem; color: var(--primary); font-weight: 700;">📖 About the Club</h3>
+        </div>
+        <div class="card-body">
+          <p style="font-size: 0.98rem; line-height: 1.7; color: #334155; margin-bottom: 1.5rem;">
+            <%= club.description %>
+          </p>
+
+          <% if (club.objectives && club.objectives.length > 0) { %>
+            <h4 style="font-size: 1rem; color: var(--primary); font-weight: 700; margin-bottom: 0.75rem;">
+              🎯 Core Objectives & Activities:
+            </h4>
+            <ul style="padding-left: 1.25rem; line-height: 1.8; color: #475569;">
+              <% club.objectives.forEach(obj => { %>
+                <li><%= obj %></li>
+              <% }) %>
+            </ul>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Recruitment Management Module (Active Drives) -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <h3 style="font-size: 1.15rem; color: var(--primary); font-weight: 700;">⚡ Recruitment Drives</h3>
+          <span class="badge <%= recruitments.length > 0 ? 'badge-open' : 'badge-closed' %>">
+            <%= recruitments.length %> Active
+          </span>
+        </div>
+        <div class="card-body">
+          <% if (recruitments.length === 0) { %>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">
+              No active recruitment drives open at this moment. Stay tuned or save this club to receive notifications when drives are announced!
+            </p>
+          <% } else { %>
+            <% recruitments.forEach(rec => { %>
+              <div style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.25rem; margin-bottom: 1rem; background: #fafafa;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                  <h4 style="font-size: 1.1rem; color: var(--primary); font-weight: 700; margin-bottom: 0.4rem;">
+                    <%= rec.title %>
+                  </h4>
+                  <span class="badge badge-open">Open</span>
+                </div>
+                <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                  Academic Year: <%= rec.academicYear %> &bull; Eligibility: <%= rec.eligibility %>
+                </p>
+
+                <div style="margin-bottom: 1rem;">
+                  <strong style="font-size: 0.85rem; color: var(--text-dark);">Open Roles:</strong>
+                  <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 0.4rem;">
+                    <% rec.roles.forEach(role => { %>
+                      <span style="background: #e2e8f0; font-size: 0.8rem; padding: 3px 8px; border-radius: 4px;">
+                        <%= role.roleName %> (<%= role.vacancies %> openings)
+                      </span>
+                    <% }) %>
+                  </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem; border-top: 1px solid var(--border-color); padding-top: 0.75rem;">
+                  <span style="font-size: 0.84rem; color: var(--danger); font-weight: 600;">
+                    ⏰ Application Deadline: <%= new Date(rec.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+                  </span>
+                  <% if (user && user.role === 'student') { %>
+                    <a href="/student/recruitments/<%= rec._id %>/apply" class="btn btn-sm btn-primary">
+                      Apply Online &rarr;
+                    </a>
+                  <% } else if (!user) { %>
+                    <a href="/auth/login" class="btn btn-sm btn-outline">Login to Apply</a>
+                  <% } %>
+                </div>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Upcoming Events Module -->
+      <div class="card">
+        <div class="card-header">
+          <h3 style="font-size: 1.15rem; color: var(--primary); font-weight: 700;">📅 Upcoming Events</h3>
+        </div>
+        <div class="card-body">
+          <% if (upcomingEvents.length === 0) { %>
+            <p style="color: var(--text-muted); font-size: 0.95rem;">
+              No upcoming events scheduled right now. Check back soon!
+            </p>
+          <% } else { %>
+            <% upcomingEvents.forEach(evt => { %>
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 0.85rem 0;">
+                <div>
+                  <h4 style="font-size: 1rem; color: var(--primary); font-weight: 600;"><%= evt.title %></h4>
+                  <span style="font-size: 0.825rem; color: var(--text-muted);">
+                    📍 <%= evt.venue %> &bull; 🕒 <%= new Date(evt.eventDate).toLocaleDateString() %>
+                  </span>
+                </div>
+                <a href="/events/<%= evt._id %>" class="btn btn-sm btn-outline">Details</a>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Leadership & Governance -->
+    <div>
+      <!-- Faculty Advisor Card -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <h3 style="font-size: 1rem; color: var(--primary); font-weight: 700;">👨‍🏫 Faculty Advisor</h3>
+        </div>
+        <div class="card-body">
+          <p style="font-weight: 700; color: var(--primary); font-size: 1.05rem;">
+            <%= club.facultyAdvisor.name %>
+          </p>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            <%= club.facultyAdvisor.designation %> &bull; <%= club.facultyAdvisor.department %>
+          </p>
+          <div style="margin-top: 0.5rem; font-size: 0.85rem;">
+            ✉️ <a href="mailto:<%= club.facultyAdvisor.email %>"><%= club.facultyAdvisor.email %></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Club Secretary Card -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <h3 style="font-size: 1rem; color: var(--primary); font-weight: 700;">👤 Club Secretary</h3>
+        </div>
+        <div class="card-body">
+          <p style="font-weight: 700; color: var(--primary); font-size: 1.05rem;">
+            <%= club.secretary.name %>
+          </p>
+          <p style="font-size: 0.85rem; color: var(--text-muted);">
+            Roll No: <%= club.secretary.rollNo || 'N/A' %>
+          </p>
+          <div style="margin-top: 0.5rem; font-size: 0.85rem;">
+            ✉️ <a href="mailto:<%= club.secretary.email %>"><%= club.secretary.email %></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Core Team Card -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header">
+          <h3 style="font-size: 1rem; color: var(--primary); font-weight: 700;">👥 Core Team</h3>
+        </div>
+        <div class="card-body">
+          <% if (club.coreTeam && club.coreTeam.length > 0) { %>
+            <ul style="list-style: none;">
+              <% club.coreTeam.forEach(member => { %>
+                <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color);">
+                  <div style="font-weight: 600; font-size: 0.9rem; color: var(--text-dark);"><%= member.name %></div>
+                  <div style="font-size: 0.78rem; color: var(--text-muted);"><%= member.designation %> &bull; <%= member.rollNo %></div>
+                </li>
+              <% }) %>
+            </ul>
+          <% } else { %>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">Core committee members listed here.</p>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Contact & Socials -->
+      <div class="card">
+        <div class="card-header">
+          <h3 style="font-size: 1rem; color: var(--primary); font-weight: 700;">🌐 Connect</h3>
+        </div>
+        <div class="card-body" style="font-size: 0.88rem; display: flex; flex-direction: column; gap: 0.5rem;">
+          <div>✉️ <%= club.contactEmail %></div>
+          <% if (club.instagram) { %>
+            <div>📸 <a href="<%= club.instagram %>" target="_blank">Instagram Profile</a></div>
+          <% } %>
+          <% if (club.linkedin) { %>
+            <div>💼 <a href="<%= club.linkedin %>" target="_blank">LinkedIn Page</a></div>
+          <% } %>
+          <div style="color: var(--text-muted); font-size: 0.8rem; margin-top: 0.5rem;">
+            Founded in <%= club.foundedYear %> at College of Technology
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

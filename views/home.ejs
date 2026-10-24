@@ -1,0 +1,237 @@
+<%- include('partials/header') %>
+<%- include('partials/navbar') %>
+<%- include('partials/alerts') %>
+
+<main>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-content">
+        <span class="hero-tag">College of Technology &bull; Student Affairs</span>
+        <h1 class="hero-title">
+          Discover, Connect & Lead with <span>College Clubs</span>
+        </h1>
+        <p class="hero-subtitle">
+          Say goodbye to fragmented WhatsApp groups and lost notices. ClubSphere is the single official hub to explore clubs, apply for recruitment drives, and register for campus events.
+        </p>
+        <div class="hero-actions">
+          <a href="/clubs" class="btn btn-lg btn-accent">Explore Clubs</a>
+          <a href="/events" class="btn btn-lg btn-outline-white">Upcoming Events</a>
+          <% if (!user) { %>
+            <a href="/auth/register" class="btn btn-lg btn-primary">Join as Student</a>
+          <% } %>
+        </div>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat-card">
+          <div class="hero-stat-number"><%= stats.clubsCount %>+</div>
+          <div class="hero-stat-label">Recognized Clubs</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="hero-stat-number"><%= stats.openRecruitmentsCount %></div>
+          <div class="hero-stat-label">Open Recruitments</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="hero-stat-number"><%= stats.eventsCount %></div>
+          <div class="hero-stat-label">Upcoming Events</div>
+        </div>
+        <div class="hero-stat-card">
+          <div class="hero-stat-number">5</div>
+          <div class="hero-stat-label">Role Workflows</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Viva Demo Quick Switcher Panel -->
+  <section class="container">
+    <div class="viva-banner">
+      <div class="viva-banner-title">
+        <span>🎓</span>
+        <span>Viva Examiner & Demo Switcher (Instant Test Accounts)</span>
+      </div>
+      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 0.75rem;">
+        Use these pre-seeded credentials to quickly demonstrate any of the 5 user roles during your viva examination. Common password for all accounts is <code>password123</code>.
+      </p>
+      <div class="viva-roles-grid">
+        <div class="viva-role-card">
+          <div>
+            <strong>🎓 1. Student</strong>
+            <div><code>student@college.ac.in</code></div>
+          </div>
+          <a href="/auth/login?role=student" class="btn btn-sm btn-outline" style="margin-top: 8px;">Login as Student</a>
+        </div>
+        <div class="viva-role-card">
+          <div>
+            <strong>⚡ 2. Club Secretary</strong>
+            <div><code>secretary@college.ac.in</code></div>
+          </div>
+          <a href="/auth/login?role=secretary" class="btn btn-sm btn-outline" style="margin-top: 8px;">Login as Secretary</a>
+        </div>
+        <div class="viva-role-card">
+          <div>
+            <strong>🛡️ 3. Core Member</strong>
+            <div><code>core@college.ac.in</code></div>
+          </div>
+          <a href="/auth/login?role=core" class="btn btn-sm btn-outline" style="margin-top: 8px;">Login as Core</a>
+        </div>
+        <div class="viva-role-card">
+          <div>
+            <strong>👨‍🏫 4. Faculty Advisor</strong>
+            <div><code>faculty@college.ac.in</code></div>
+          </div>
+          <a href="/auth/login?role=faculty" class="btn btn-sm btn-outline" style="margin-top: 8px;">Login as Faculty</a>
+        </div>
+        <div class="viva-role-card">
+          <div>
+            <strong>👑 5. Admin (Dean)</strong>
+            <div><code>admin@college.ac.in</code></div>
+          </div>
+          <a href="/auth/login?role=admin" class="btn btn-sm btn-outline" style="margin-top: 8px;">Login as Admin</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Open Recruitment Drives Highlights -->
+  <% if (activeRecruitments && activeRecruitments.length > 0) { %>
+    <section class="container" style="margin-top: 2.5rem;">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">⚡ Active Recruitment Drives</h2>
+          <p class="section-subtitle">Apply online and get shortlisted directly by club executive committees</p>
+        </div>
+        <a href="/clubs" class="btn btn-outline">View All Drives &rarr;</a>
+      </div>
+
+      <div class="grid-2">
+        <% activeRecruitments.forEach(rec => { %>
+          <div class="card">
+            <div class="card-header">
+              <span class="badge badge-category"><%= rec.club.category %></span>
+              <span class="badge badge-open">Recruitment Open</span>
+            </div>
+            <div class="card-body">
+              <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 0.4rem;">
+                <%= rec.title %>
+              </h3>
+              <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+                Hosted by <strong><%= rec.club.name %></strong>
+              </p>
+              <div style="font-size: 0.85rem; color: #475569; margin-bottom: 1rem;">
+                <strong>Open Roles:</strong>
+                <ul style="padding-left: 1.2rem; margin-top: 0.3rem;">
+                  <% rec.roles.forEach(role => { %>
+                    <li><%= role.roleName %> (<%= role.vacancies %> openings)</li>
+                  <% }) %>
+                </ul>
+              </div>
+              <div class="club-meta-item">
+                <span>📅 Deadline: <strong><%= new Date(rec.deadline).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) %></strong></span>
+              </div>
+            </div>
+            <div class="card-footer">
+              <a href="/clubs/<%= rec.club._id %>" class="btn btn-sm btn-outline">Club Profile</a>
+              <% if (user && user.role === 'student') { %>
+                <a href="/student/recruitments/<%= rec._id %>/apply" class="btn btn-sm btn-primary">Apply Now</a>
+              <% } else if (!user) { %>
+                <a href="/auth/login" class="btn btn-sm btn-primary">Login to Apply</a>
+              <% } %>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+  <!-- Featured Clubs Section -->
+  <section class="container" style="margin-top: 3.5rem;">
+    <div class="section-header">
+      <div>
+        <h2 class="section-title">🏛️ Featured Clubs & Societies</h2>
+        <p class="section-subtitle">Technical, Cultural, Sports, and Social impact organizations at ClubSphere</p>
+      </div>
+      <a href="/clubs" class="btn btn-outline">Browse All Clubs &rarr;</a>
+    </div>
+
+    <div class="grid-3">
+      <% featuredClubs.forEach(club => { %>
+        <div class="card">
+          <div class="card-body">
+            <div class="club-card-badge-row">
+              <span class="badge badge-category"><%= club.category %></span>
+              <% if (club.recruitmentStatus === 'Open') { %>
+                <span class="badge badge-open">Recruitment Open</span>
+              <% } else if (club.recruitmentStatus === 'Coming Soon') { %>
+                <span class="badge badge-coming-soon">Coming Soon</span>
+              <% } else { %>
+                <span class="badge badge-closed">Recruitment Closed</span>
+              <% } %>
+            </div>
+
+            <h3 class="club-card-title"><%= club.name %></h3>
+            <p class="club-card-tagline"><%= club.tagline %></p>
+
+            <div class="club-meta-item">
+              <span>👨‍🏫 Advisor: <%= club.facultyAdvisor.name %></span>
+            </div>
+            <div class="club-meta-item">
+              <span>👤 Secretary: <%= club.secretary.name %></span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <span style="font-size: 0.8rem; color: var(--text-muted); font-weight: 600;">Est. <%= club.foundedYear %></span>
+            <a href="/clubs/<%= club._id %>" class="btn btn-sm btn-primary">View Details &rarr;</a>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+
+  <!-- Upcoming Campus Events -->
+  <% if (upcomingEvents && upcomingEvents.length > 0) { %>
+    <section class="container" style="margin: 3.5rem auto 4.5rem;">
+      <div class="section-header">
+        <div>
+          <h2 class="section-title">📅 Upcoming Campus Events</h2>
+          <p class="section-subtitle">Workshops, hackathons, and competitions scheduled at ClubSphere</p>
+        </div>
+        <a href="/events" class="btn btn-outline">All Events &rarr;</a>
+      </div>
+
+      <div class="grid-2">
+        <% upcomingEvents.forEach(evt => { %>
+          <div class="card">
+            <div class="card-body">
+              <div style="display:flex; justify-content:space-between; margin-bottom: 0.5rem;">
+                <span class="badge badge-category"><%= evt.category %></span>
+                <span style="font-size: 0.85rem; font-weight: 600; color: var(--secondary);">
+                  <%= evt.participants.length %> / <%= evt.maxParticipants %> Registered
+                </span>
+              </div>
+              <h3 style="font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-bottom: 0.35rem;">
+                <%= evt.title %>
+              </h3>
+              <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 0.8rem;">
+                Organized by <strong><%= evt.club.name %></strong>
+              </p>
+              <div class="club-meta-item">
+                <span>📍 Venue: <%= evt.venue %></span>
+              </div>
+              <div class="club-meta-item">
+                <span>🕒 Date & Time: <%= new Date(evt.eventDate).toLocaleDateString() %> (<%= evt.startTime %> - <%= evt.endTime %>)</span>
+              </div>
+            </div>
+            <div class="card-footer">
+              <a href="/events/<%= evt._id %>" class="btn btn-sm btn-outline">Details & Venue</a>
+              <a href="/events/<%= evt._id %>" class="btn btn-sm btn-primary">Register Free</a>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+</main>
+
+<%- include('partials/footer') %>

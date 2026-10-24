@@ -1,0 +1,62 @@
+<nav class="navbar">
+  <div class="container nav-container">
+    <a href="/" class="brand">
+      <span class="brand-icon">CS</span>
+      <span>ClubSphere</span>
+    </a>
+
+    <div class="nav-right-actions">
+      <ul class="nav-links">
+        <li><a href="/clubs" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'clubs' ? 'active' : '' %>">Discover Clubs</a></li>
+        <li><a href="/events" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'events' ? 'active' : '' %>">Campus Events</a></li>
+
+        <% if (user) { %>
+          <% if (user.role === 'student') { %>
+            <li><a href="/student/dashboard" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">Dashboard</a></li>
+            <li><a href="/student/applications" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'applications' ? 'active' : '' %>">My Applications</a></li>
+            <li>
+              <a href="/student/notifications" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'notifications' ? 'active' : '' %>">
+                Alerts
+                <% if (typeof unreadNotifs !== 'undefined' && unreadNotifs > 0) { %>
+                  <span class="nav-badge"><%= unreadNotifs %></span>
+                <% } %>
+              </a>
+            </li>
+          <% } else if (user.role === 'secretary') { %>
+            <li><a href="/secretary/dashboard" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">Secretary Panel</a></li>
+            <li><a href="/secretary/applications" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'applications' ? 'active' : '' %>">Applicants</a></li>
+            <li><a href="/secretary/recruitments" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'recruitments' ? 'active' : '' %>">Recruitments</a></li>
+            <li><a href="/secretary/events" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'events' ? 'active' : '' %>">Events</a></li>
+          <% } else if (user.role === 'core') { %>
+            <li><a href="/core/dashboard" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">Core Team Portal</a></li>
+            <li><a href="/core/applications" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'applications' ? 'active' : '' %>">Screening</a></li>
+          <% } else if (user.role === 'faculty') { %>
+            <li><a href="/faculty/dashboard" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">Faculty Portal</a></li>
+            <li><a href="/faculty/recruitments" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'recruitments' ? 'active' : '' %>">Approve Drives</a></li>
+          <% } else if (user.role === 'admin') { %>
+            <li><a href="/admin/dashboard" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'dashboard' ? 'active' : '' %>">Admin Center</a></li>
+            <li><a href="/admin/clubs" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'clubs' ? 'active' : '' %>">Clubs</a></li>
+            <li><a href="/admin/users" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'users' ? 'active' : '' %>">Users</a></li>
+            <li><a href="/admin/reports" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'reports' ? 'active' : '' %>">Reports</a></li>
+          <% } %>
+
+          <li class="user-badge">
+            <span class="user-avatar-dot"></span>
+            <span><%= user.name.split(' ')[0] %></span>
+            <span class="user-role-tag role-<%= user.role %>"><%= user.role %></span>
+          </li>
+          <li><a href="/auth/logout" class="btn btn-sm btn-outline-nav">Logout</a></li>
+        <% } else { %>
+          <li><a href="/auth/login" class="nav-link <%= typeof currentPage !== 'undefined' && currentPage === 'login' ? 'active' : '' %>">Login</a></li>
+          <li><a href="/auth/register" class="btn btn-sm btn-primary">Student Register</a></li>
+        <% } %>
+      </ul>
+
+      <button id="themeToggle" class="theme-toggle-btn" aria-label="Toggle Theme" title="Toggle Light/Dark Theme">
+        <span class="theme-icon">🌙</span>
+      </button>
+
+      <button class="mobile-menu-btn" aria-label="Toggle navigation">☰</button>
+    </div>
+  </div>
+</nav>

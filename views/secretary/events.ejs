@@ -1,0 +1,68 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">🎟️ Events & Workshops Manager</h1>
+      <p class="section-subtitle">Manage campus technical symposiums, workshops, and registrations for <%= club.name %></p>
+    </div>
+    <a href="/secretary/events/new" class="btn btn-primary">+ Create New Event</a>
+  </div>
+
+  <% if (events.length === 0) { %>
+    <div style="text-align: center; padding: 4rem 1rem; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <h3 style="color: var(--primary); font-size: 1.35rem; margin-bottom: 0.5rem;">No events scheduled</h3>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Create a workshop or hackathon to boost student engagement.</p>
+      <a href="/secretary/events/new" class="btn btn-primary">+ Create First Event</a>
+    </div>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Event Title</th>
+            <th>Category</th>
+            <th>Date & Time</th>
+            <th>Venue</th>
+            <th>Registrations</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% events.forEach(evt => { %>
+            <tr>
+              <td>
+                <strong style="color: var(--primary); font-size: 0.95rem;"><%= evt.title %></strong>
+              </td>
+              <td><span class="badge badge-category"><%= evt.category %></span></td>
+              <td style="font-size: 0.85rem;">
+                <%= new Date(evt.eventDate).toLocaleDateString() %><br>
+                <span style="color: var(--text-muted);"><%= evt.startTime %> - <%= evt.endTime %></span>
+              </td>
+              <td><%= evt.venue %></td>
+              <td>
+                <strong><%= evt.participants.length %></strong> / <%= evt.maxParticipants %>
+              </td>
+              <td>
+                <span class="badge <%= evt.status === 'Upcoming' ? 'badge-open' : 'badge-closed' %>">
+                  <%= evt.status %>
+                </span>
+              </td>
+              <td>
+                <div style="display: flex; gap: 6px;">
+                  <a href="/events/<%= evt._id %>" class="btn btn-sm btn-outline">Preview</a>
+                  <a href="/core/events/<%= evt._id %>/participants" class="btn btn-sm btn-primary">Roster</a>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+</main>
+
+<%- include('../partials/footer') %>

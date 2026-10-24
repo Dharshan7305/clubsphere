@@ -1,0 +1,97 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">📅 Campus Events & Workshops</h1>
+      <p class="section-subtitle">Hackathons, bootcamps, technical symposia, and guest lectures across ClubSphere</p>
+    </div>
+  </div>
+
+  <!-- Event Filter Bar -->
+  <div class="filter-bar">
+    <form action="/events" method="GET" style="display: flex; gap: 1rem; width: 100%; flex-wrap: wrap;">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          name="search" 
+          class="search-input" 
+          placeholder="Search events by title, description or venue..." 
+          value="<%= searchQuery %>"
+        >
+      </div>
+      <input type="hidden" name="category" value="<%= selectedCategory %>">
+      <button type="submit" class="btn btn-primary">Search</button>
+      <% if (searchQuery || (selectedCategory && selectedCategory !== 'All')) { %>
+        <a href="/events" class="btn btn-outline">Clear</a>
+      <% } %>
+    </form>
+
+    <div class="category-pills">
+      <% categories.forEach(cat => { %>
+        <a 
+          href="/events?category=<%= encodeURIComponent(cat) %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>" 
+          class="category-pill <%= selectedCategory === cat ? 'active' : '' %>"
+        >
+          <%= cat %>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+
+  <!-- Events List Grid -->
+  <% if (events.length === 0) { %>
+    <div style="text-align: center; padding: 4rem 1rem; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <h3 style="color: var(--primary); font-size: 1.35rem; margin-bottom: 0.5rem;">No events found</h3>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Check back soon or explore our clubs directory.</p>
+      <a href="/events" class="btn btn-outline">View All Events</a>
+    </div>
+  <% } else { %>
+    <div class="grid-2">
+      <% events.forEach(evt => { %>
+        <div class="card">
+          <div class="card-body">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.75rem;">
+              <span class="badge badge-category"><%= evt.category %></span>
+              <span style="font-size: 0.8rem; font-weight: 700; color: <%= evt.participants.length >= evt.maxParticipants ? 'var(--danger)' : 'var(--success)' %>;">
+                <%= evt.participants.length %> / <%= evt.maxParticipants %> Registered
+              </span>
+            </div>
+
+            <h2 style="font-size: 1.35rem; font-weight: 700; color: var(--primary); margin-bottom: 0.4rem;">
+              <%= evt.title %>
+            </h2>
+            <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 1rem;">
+              Organized by <strong><%= evt.club ? evt.club.name : 'College Club' %></strong>
+            </p>
+
+            <p style="font-size: 0.92rem; color: #475569; margin-bottom: 1.25rem; line-height: 1.6;">
+              <%= evt.description.length > 140 ? evt.description.substring(0, 140) + '...' : evt.description %>
+            </p>
+
+            <div class="club-meta-item">
+              <span>📍 <strong>Venue:</strong> <%= evt.venue %></span>
+            </div>
+            <div class="club-meta-item">
+              <span>🕒 <strong>Date:</strong> <%= new Date(evt.eventDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) %> (<%= evt.startTime %> - <%= evt.endTime %>)</span>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <span style="font-size: 0.825rem; color: var(--danger); font-weight: 600;">
+              Reg. Deadline: <%= new Date(evt.registrationDeadline).toLocaleDateString() %>
+            </span>
+            <a href="/events/<%= evt._id %>" class="btn btn-sm btn-primary">
+              View & Register &rarr;
+            </a>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</main>
+
+<%- include('../partials/footer') %>

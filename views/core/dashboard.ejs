@@ -1,0 +1,95 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container dashboard-wrapper">
+  <div class="section-header">
+    <div>
+      <span class="badge badge-category" style="margin-bottom: 0.25rem;"><%= club.category %></span>
+      <h1 class="section-title">👥 Core Team Operations Portal</h1>
+      <p class="section-subtitle">Logged in as <%= user.name %> (Core Member &bull; <%= club.name %>)</p>
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+      <a href="/core/applications" class="btn btn-outline">Review Applicants</a>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-blue">🎟️</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= events.length %></div>
+        <div class="stat-title">Club Events</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-green">✅</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= totalParticipants %></div>
+        <div class="stat-title">Total Registrations</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-purple">📋</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= applications.length %></div>
+        <div class="stat-title">Recent Applicants</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Events Roster Table -->
+  <div class="card" style="margin-bottom: 2rem;">
+    <div class="card-header">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary);">
+        📅 Assigned Club Events & Attendance Desks
+      </h3>
+    </div>
+    <div class="card-body" style="padding: 0;">
+      <% if (events.length === 0) { %>
+        <p style="padding: 2rem; text-align: center; color: var(--text-muted);">No events scheduled currently.</p>
+      <% } else { %>
+        <div class="table-responsive" style="border: none; box-shadow: none;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Event Title</th>
+                <th>Date & Time</th>
+                <th>Venue</th>
+                <th>Registered Students</th>
+                <th>Attendance Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% events.forEach(evt => { %>
+                <tr>
+                  <td>
+                    <strong style="color: var(--primary);"><%= evt.title %></strong>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);"><%= evt.category %></div>
+                  </td>
+                  <td style="font-size: 0.85rem;">
+                    <%= new Date(evt.eventDate).toLocaleDateString() %><br>
+                    <span style="color: var(--text-muted);"><%= evt.startTime %></span>
+                  </td>
+                  <td><%= evt.venue %></td>
+                  <td>
+                    <span class="badge badge-open">
+                      <%= evt.participants.length %> / <%= evt.maxParticipants %>
+                    </span>
+                  </td>
+                  <td>
+                    <a href="/core/events/<%= evt._id %>/participants" class="btn btn-sm btn-primary">
+                      ✓ Take Attendance Roster &rarr;
+                    </a>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

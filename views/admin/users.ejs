@@ -1,0 +1,85 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">👤 User Roles & Access Control</h1>
+      <p class="section-subtitle">Manage platform permissions across Students, Secretaries, Core Members, and Faculty</p>
+    </div>
+  </div>
+
+  <!-- Role Filter Bar -->
+  <div class="filter-bar">
+    <div class="category-pills">
+      <a href="/admin/users?role=All" class="category-pill <%= selectedRole === 'All' ? 'active' : '' %>">All Users</a>
+      <a href="/admin/users?role=student" class="category-pill <%= selectedRole === 'student' ? 'active' : '' %>">Students</a>
+      <a href="/admin/users?role=secretary" class="category-pill <%= selectedRole === 'secretary' ? 'active' : '' %>">Secretaries</a>
+      <a href="/admin/users?role=core" class="category-pill <%= selectedRole === 'core' ? 'active' : '' %>">Core Members</a>
+      <a href="/admin/users?role=faculty" class="category-pill <%= selectedRole === 'faculty' ? 'active' : '' %>">Faculty Advisors</a>
+      <a href="/admin/users?role=admin" class="category-pill <%= selectedRole === 'admin' ? 'active' : '' %>">Admins</a>
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>User Name</th>
+          <th>Email Address</th>
+          <th>Roll No / Dept</th>
+          <th>Current Role</th>
+          <th>Assigned Club</th>
+          <th>Modify Permissions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach(u => { %>
+          <tr>
+            <td>
+              <strong style="color: var(--primary); font-size: 0.95rem;"><%= u.name %></strong>
+            </td>
+            <td><%= u.email %></td>
+            <td>
+              <%= u.rollNo || 'N/A' %><br>
+              <span style="font-size: 0.78rem; color: var(--text-muted);"><%= u.department %></span>
+            </td>
+            <td>
+              <span class="user-role-tag" style="background: <%= u.role === 'admin' ? '#ef4444' : (u.role === 'faculty' ? '#3b82f6' : (u.role === 'secretary' ? '#f59e0b' : '#10b981')) %>; color: #fff;">
+                <%= u.role %>
+              </span>
+            </td>
+            <td>
+              <%= u.club ? u.club.name : '—' %>
+            </td>
+            <td>
+              <form action="/admin/users/<%= u._id %>/role" method="POST" style="display: flex; gap: 6px; align-items: center;">
+                <select name="role" class="form-control" style="padding: 0.3rem 0.5rem; font-size: 0.825rem; width: auto;">
+                  <option value="student" <%= u.role === 'student' ? 'selected' : '' %>>student</option>
+                  <option value="secretary" <%= u.role === 'secretary' ? 'selected' : '' %>>secretary</option>
+                  <option value="core" <%= u.role === 'core' ? 'selected' : '' %>>core</option>
+                  <option value="faculty" <%= u.role === 'faculty' ? 'selected' : '' %>>faculty</option>
+                  <option value="admin" <%= u.role === 'admin' ? 'selected' : '' %>>admin</option>
+                </select>
+
+                <select name="clubId" class="form-control" style="padding: 0.3rem 0.5rem; font-size: 0.825rem; width: auto;">
+                  <option value="">No Club</option>
+                  <% clubs.forEach(c => { %>
+                    <option value="<%= c._id %>" <%= (u.club && u.club._id.toString() === c._id.toString()) ? 'selected' : '' %>>
+                      <%= c.code %> - <%= c.name %>
+                    </option>
+                  <% }) %>
+                </select>
+
+                <button type="submit" class="btn btn-sm btn-outline">Update</button>
+              </form>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

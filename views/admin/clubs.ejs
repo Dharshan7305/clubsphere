@@ -1,0 +1,243 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">🏛️ College Clubs Administration</h1>
+      <p class="section-subtitle">Add new student clubs, edit profiles, and toggle active status</p>
+    </div>
+    <button class="btn btn-primary" onclick="openModal('addClubModal')">+ Add New Club</button>
+  </div>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Club Name</th>
+          <th>Code</th>
+          <th>Category</th>
+          <th>Faculty Advisor</th>
+          <th>Secretary</th>
+          <th>Recruitment</th>
+          <th>Active</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% clubs.forEach(club => { %>
+          <tr>
+            <td>
+              <strong style="color: var(--primary); font-size: 0.95rem;"><%= club.name %></strong>
+            </td>
+            <td><span style="font-weight: 700; background: #e2e8f0; padding: 2px 6px; border-radius: 4px;"><%= club.code %></span></td>
+            <td><span class="badge badge-category"><%= club.category %></span></td>
+            <td style="font-size: 0.85rem;"><%= club.facultyAdvisor.name %></td>
+            <td style="font-size: 0.85rem;"><%= club.secretary.name %></td>
+            <td>
+              <span class="badge <%= club.recruitmentStatus === 'Open' ? 'badge-open' : 'badge-closed' %>">
+                <%= club.recruitmentStatus %>
+              </span>
+            </td>
+            <td>
+              <span style="color: <%= club.isActive ? 'var(--success)' : 'var(--danger)' %>; font-weight: 700;">
+                <%= club.isActive ? 'Active' : 'Inactive' %>
+              </span>
+            </td>
+            <td>
+              <div style="display: flex; gap: 6px;">
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-outline"
+                  onclick="openEditClubModal(
+                    '<%= club._id %>',
+                    '<%= club.name.replace(/'/g, \"\\'\") %>',
+                    '<%= club.category %>',
+                    '<%= club.tagline.replace(/'/g, \"\\'\") %>',
+                    '<%= club.description.replace(/'/g, \"\\'\").replace(/\n/g, \" \") %>',
+                    '<%= club.contactEmail %>',
+                    '<%= club.recruitmentStatus %>',
+                    <%= club.isActive %>
+                  )"
+                >
+                  Edit
+                </button>
+
+                <form action="/admin/clubs/<%= club._id %>/delete" method="POST" onsubmit="return confirm('Are you sure you want to delete <%= club.name %>?');" style="display: inline;">
+                  <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                </form>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Modal: Add New Club -->
+  <div class="modal-overlay" id="addClubModal">
+    <div class="modal-box" style="max-width: 700px;">
+      <div class="modal-header">
+        <h3 class="modal-title">Register New College Club</h3>
+        <button class="modal-close" onclick="closeModal('addClubModal')">✕</button>
+      </div>
+      <form action="/admin/clubs/add" method="POST">
+        <div class="modal-body">
+          <div class="form-row">
+            <div class="form-group">
+              <label for="name">Club Name *</label>
+              <input type="text" id="name" name="name" class="form-control" placeholder="e.g. Artificial Intelligence Club" required>
+            </div>
+            <div class="form-group">
+              <label for="code">Unique Code *</label>
+              <input type="text" id="code" name="code" class="form-control" placeholder="e.g. AIC" required>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="category">Category *</label>
+              <select id="category" name="category" class="form-control">
+                <option value="Technical">Technical</option>
+                <option value="Cultural">Cultural</option>
+                <option value="Social & NSS">Social & NSS</option>
+                <option value="Sports">Sports</option>
+                <option value="Literary & Media">Literary & Media</option>
+                <option value="Entrepreneurship">Entrepreneurship</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="contactEmail">Official Contact Email *</label>
+              <input type="email" id="contactEmail" name="contactEmail" class="form-control" placeholder="club@college.ac.in" required>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="tagline">Tagline</label>
+            <input type="text" id="tagline" name="tagline" class="form-control" placeholder="Short inspiring motto">
+          </div>
+
+          <div class="form-group">
+            <label for="description">Detailed Description *</label>
+            <textarea id="description" name="description" class="form-control" required placeholder="Club objectives and mandate..."></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="facultyName">Faculty Advisor Name</label>
+              <input type="text" id="facultyName" name="facultyName" class="form-control" placeholder="Dr. Faculty Advisor">
+            </div>
+            <div class="form-group">
+              <label for="facultyEmail">Faculty Email</label>
+              <input type="email" id="facultyEmail" name="facultyEmail" class="form-control" placeholder="faculty@college.ac.in">
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="secretaryName">Student Secretary Name</label>
+              <input type="text" id="secretaryName" name="secretaryName" class="form-control" placeholder="Student Name">
+            </div>
+            <div class="form-group">
+              <label for="secretaryEmail">Secretary Email</label>
+              <input type="email" id="secretaryEmail" name="secretaryEmail" class="form-control" placeholder="secretary@college.ac.in">
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('addClubModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Create Club &rarr;</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Modal: Edit Existing Club -->
+  <div class="modal-overlay" id="editClubModal">
+    <div class="modal-box" style="max-width: 650px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="editClubTitle">Edit Club</h3>
+        <button class="modal-close" onclick="closeModal('editClubModal')">✕</button>
+      </div>
+      <form id="editClubForm" method="POST">
+        <div class="modal-body">
+          <div class="form-group">
+            <label for="eName">Club Name</label>
+            <input type="text" id="eName" name="name" class="form-control" required>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="eCategory">Category</label>
+              <select id="eCategory" name="category" class="form-control">
+                <option value="Technical">Technical</option>
+                <option value="Cultural">Cultural</option>
+                <option value="Social & NSS">Social & NSS</option>
+                <option value="Sports">Sports</option>
+                <option value="Literary & Media">Literary & Media</option>
+                <option value="Entrepreneurship">Entrepreneurship</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="eRecruitmentStatus">Recruitment Status</label>
+              <select id="eRecruitmentStatus" name="recruitmentStatus" class="form-control">
+                <option value="Open">Open</option>
+                <option value="Closed">Closed</option>
+                <option value="Coming Soon">Coming Soon</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="eTagline">Tagline</label>
+            <input type="text" id="eTagline" name="tagline" class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label for="eDescription">Description</label>
+            <textarea id="eDescription" name="description" class="form-control" style="min-height: 90px;"></textarea>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="eContactEmail">Contact Email</label>
+              <input type="email" id="eContactEmail" name="contactEmail" class="form-control">
+            </div>
+            <div class="form-group">
+              <label for="eIsActive">Active on Platform?</label>
+              <select id="eIsActive" name="isActive" class="form-control">
+                <option value="true">Active (Visible)</option>
+                <option value="false">Inactive (Hidden)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('editClubModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Changes &rarr;</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script>
+function openEditClubModal(id, name, category, tagline, desc, email, recStatus, isActive) {
+  document.getElementById('editClubForm').action = `/admin/clubs/${id}/edit`;
+  document.getElementById('editClubTitle').innerText = `Edit: ${name}`;
+  document.getElementById('eName').value = name;
+  document.getElementById('eCategory').value = category;
+  document.getElementById('eTagline').value = tagline;
+  document.getElementById('eDescription').value = desc;
+  document.getElementById('eContactEmail').value = email;
+  document.getElementById('eRecruitmentStatus').value = recStatus;
+  document.getElementById('eIsActive').value = isActive ? 'true' : 'false';
+
+  openModal('editClubModal');
+}
+</script>
+
+<%- include('../partials/footer') %>

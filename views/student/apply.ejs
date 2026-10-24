@@ -1,0 +1,106 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <div style="margin-bottom: 1.5rem;">
+    <a href="/clubs/<%= recruitment.club._id %>" class="btn btn-sm btn-outline">&larr; Back to <%= recruitment.club.name %></a>
+  </div>
+
+  <div class="form-card" style="max-width: 800px;">
+    <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem; margin-bottom: 2rem;">
+      <span class="badge badge-open" style="margin-bottom: 0.5rem;">Recruitment Application</span>
+      <h1 style="font-size: 1.85rem; font-weight: 800; color: var(--primary); margin-bottom: 0.35rem;">
+        <%= recruitment.title %>
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.95rem;">
+        Applying to <strong><%= recruitment.club.name %></strong> &bull; Deadline: <%= new Date(recruitment.deadline).toLocaleDateString() %>
+      </p>
+      <% if (recruitment.instructions) { %>
+        <div style="background: #f1f5f9; padding: 0.75rem 1rem; border-radius: var(--radius-sm); margin-top: 1rem; font-size: 0.85rem; color: #475569;">
+          ℹ️ <strong>Instructions:</strong> <%= recruitment.instructions %>
+        </div>
+      <% } %>
+    </div>
+
+    <form action="/student/recruitments/<%= recruitment._id %>/apply" method="POST">
+      <!-- Role Selection -->
+      <div class="form-group">
+        <label for="appliedRole">Select Role You Wish to Apply For *</label>
+        <select id="appliedRole" name="appliedRole" class="form-control" required>
+          <% recruitment.roles.forEach(role => { %>
+            <option value="<%= role.roleName %>">
+              <%= role.roleName %> (<%= role.vacancies %> openings)
+            </option>
+          <% }) %>
+        </select>
+      </div>
+
+      <!-- Applicant Details -->
+      <div class="form-row">
+        <div class="form-group">
+          <label for="studentName">Full Name</label>
+          <input type="text" id="studentName" class="form-control" value="<%= user.name %>" readonly style="background-color: #f1f5f9;">
+        </div>
+        <div class="form-group">
+          <label for="rollNo">Roll Number *</label>
+          <input type="text" id="rollNo" name="rollNo" class="form-control" value="<%= user.rollNo %>" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="department">Department</label>
+          <input type="text" id="department" name="department" class="form-control" value="<%= user.department %>" required>
+        </div>
+        <div class="form-group">
+          <label for="year">Year of Study</label>
+          <select id="year" name="year" class="form-control" required>
+            <option value="1" <%= user.year === 1 ? 'selected' : '' %>>1st Year</option>
+            <option value="2" <%= user.year === 2 ? 'selected' : '' %>>2nd Year</option>
+            <option value="3" <%= user.year === 3 ? 'selected' : '' %>>3rd Year</option>
+            <option value="4" <%= user.year === 4 ? 'selected' : '' %>>4th Year</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="phone">Contact Number *</label>
+          <input type="tel" id="phone" name="phone" class="form-control" value="<%= user.phone %>" placeholder="10-digit mobile" required>
+        </div>
+        <div class="form-group">
+          <label for="cgpa">Current CGPA</label>
+          <input type="number" step="0.01" min="0" max="10" id="cgpa" name="cgpa" class="form-control" placeholder="e.g. 8.75">
+        </div>
+      </div>
+
+      <!-- Qualitative Questions -->
+      <div class="form-group">
+        <label for="skills">Skills & Technical Competencies *</label>
+        <textarea id="skills" name="skills" class="form-control" placeholder="List your key skills, programming languages, design tools, management experience (e.g. JavaScript, C++, Python, UI/UX, Event Management)..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="priorExperience">Prior Projects or Experience</label>
+        <textarea id="priorExperience" name="priorExperience" class="form-control" placeholder="Briefly describe any relevant projects, school/college club participation, or competitions..."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="whyJoin">Why do you want to join <%= recruitment.club.name %>? *</label>
+        <textarea id="whyJoin" name="whyJoin" class="form-control" placeholder="Explain your motivation, what you hope to learn, and how you will contribute..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="portfolioLink">Portfolio / GitHub / LinkedIn / Drive Link (Optional)</label>
+        <input type="url" id="portfolioLink" name="portfolioLink" class="form-control" placeholder="https://github.com/your-username or personal link">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+        Submit Recruitment Application &rarr;
+      </button>
+    </form>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

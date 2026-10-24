@@ -1,0 +1,189 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container dashboard-wrapper">
+  <div class="section-header">
+    <div>
+      <span class="badge badge-category" style="margin-bottom: 0.25rem;"><%= club.category %></span>
+      <h1 class="section-title">⚡ <%= club.name %> - Secretary Panel</h1>
+      <p class="section-subtitle">Logged in as <%= user.name %> (Secretary) &bull; Manage recruitments, applications & events</p>
+    </div>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <a href="/secretary/club" class="btn btn-outline">Edit Club Profile</a>
+      <a href="/secretary/recruitments" class="btn btn-outline">+ Post Recruitment</a>
+      <a href="/secretary/events/new" class="btn btn-primary">+ Create Event</a>
+    </div>
+  </div>
+
+  <!-- Secretary Metrics Grid -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-blue">👥</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= metrics.totalApplicants %></div>
+        <div class="stat-title">Total Applicants</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-yellow">⏳</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= metrics.pendingApplicants %></div>
+        <div class="stat-title">Pending Screening</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-purple">📅</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= metrics.shortlistedApplicants %></div>
+        <div class="stat-title">Shortlisted Candidates</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-green">🎉</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= metrics.acceptedApplicants %></div>
+        <div class="stat-title">Accepted Members</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="grid-template-columns: 2fr 1fr; align-items: start;">
+    <!-- Left Column: Recent Applicants -->
+    <div>
+      <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+          <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+            📋 Recent Recruitment Applicants
+          </h3>
+          <a href="/secretary/applications" class="btn btn-sm btn-outline">View All Applicants &rarr;</a>
+        </div>
+        <div class="card-body" style="padding: 0;">
+          <% if (applications.length === 0) { %>
+            <p style="padding: 2rem; text-align: center; color: var(--text-muted);">
+              No applicants received yet for current recruitment drives.
+            </p>
+          <% } else { %>
+            <div class="table-responsive" style="border: none; box-shadow: none;">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Candidate</th>
+                    <th>Roll No</th>
+                    <th>Applied Role</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% applications.forEach(app => { %>
+                    <tr>
+                      <td>
+                        <strong><%= app.studentName %></strong>
+                        <div style="font-size: 0.78rem; color: var(--text-muted);"><%= app.department %></div>
+                      </td>
+                      <td><%= app.rollNo %></td>
+                      <td><%= app.appliedRole %></td>
+                      <td>
+                        <% if (app.status === 'Submitted') { %>
+                          <span class="badge badge-submitted">Submitted</span>
+                        <% } else if (app.status === 'Shortlisted') { %>
+                          <span class="badge badge-shortlisted">Shortlisted</span>
+                        <% } else if (app.status === 'Accepted') { %>
+                          <span class="badge badge-accepted">Accepted</span>
+                        <% } else { %>
+                          <span class="badge badge-rejected">Rejected</span>
+                        <% } %>
+                      </td>
+                      <td>
+                        <a href="/secretary/applications" class="btn btn-sm btn-outline">Review</a>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Events Preview -->
+      <div class="card">
+        <div class="card-header">
+          <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+            🎟️ Club Events & Participation
+          </h3>
+          <a href="/secretary/events" class="btn btn-sm btn-outline">Manage Events &rarr;</a>
+        </div>
+        <div class="card-body">
+          <% if (events.length === 0) { %>
+            <p style="text-align: center; color: var(--text-muted); padding: 1.5rem 0;">
+              No events posted yet. Click "+ Create Event" to schedule workshops and hackathons!
+            </p>
+          <% } else { %>
+            <% events.forEach(evt => { %>
+              <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding: 0.75rem 0;">
+                <div>
+                  <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--primary);"><%= evt.title %></h4>
+                  <span style="font-size: 0.8rem; color: var(--text-muted);">
+                    📍 <%= evt.venue %> &bull; 🕒 <%= new Date(evt.eventDate).toLocaleDateString() %>
+                  </span>
+                </div>
+                <div>
+                  <span class="badge badge-category"><%= evt.participants.length %> Registered</span>
+                </div>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Quick Announcement & Club Summary -->
+    <div>
+      <!-- Broadcast Announcement to Students -->
+      <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+          <h3 style="font-size: 1rem; font-weight: 700; color: var(--primary);">
+            📢 Broadcast Announcement
+          </h3>
+        </div>
+        <div class="card-body">
+          <form action="/secretary/announcement" method="POST">
+            <div class="form-group">
+              <label for="annTitle">Title *</label>
+              <input type="text" id="annTitle" name="title" class="form-control" placeholder="e.g. Orientation Session Date" required>
+            </div>
+            <div class="form-group">
+              <label for="annMessage">Message *</label>
+              <textarea id="annMessage" name="message" class="form-control" placeholder="Type notification content broadcasted to all students..." required style="min-height: 80px;"></textarea>
+            </div>
+            <button type="submit" class="btn btn-sm btn-primary" style="width: 100%;">
+              Broadcast Announcement &rarr;
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Quick Club Profile Snapshot -->
+      <div class="card">
+        <div class="card-header">
+          <h3 style="font-size: 1rem; font-weight: 700; color: var(--primary);">
+            🏛️ Club Profile Info
+          </h3>
+        </div>
+        <div class="card-body" style="font-size: 0.88rem;">
+          <p><strong>Faculty Advisor:</strong> <%= club.facultyAdvisor.name %></p>
+          <p style="color: var(--text-muted); font-size: 0.82rem; margin-bottom: 0.5rem;"><%= club.facultyAdvisor.email %></p>
+          <p><strong>Recruitment Status:</strong> <span class="badge <%= club.recruitmentStatus === 'Open' ? 'badge-open' : 'badge-closed' %>"><%= club.recruitmentStatus %></span></p>
+          <p style="margin-top: 0.5rem;"><strong>Contact:</strong> <%= club.contactEmail %></p>
+          <div style="margin-top: 1rem;">
+            <a href="/secretary/club" class="btn btn-sm btn-outline" style="width: 100%; text-align: center;">Edit Profile & Objectives</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

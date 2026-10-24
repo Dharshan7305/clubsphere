@@ -1,0 +1,183 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <div class="section-header">
+    <div>
+      <span class="badge badge-category" style="margin-bottom: 0.25rem;">WAD Final Project Report</span>
+      <h1 class="section-title">📊 Platform Governance & Viva Evaluation Report</h1>
+      <p class="section-subtitle">Comprehensive metrics report for College ClubSphere discovery & recruitment platform</p>
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+      <button class="btn btn-primary" onclick="window.print()">🖨️ Print / Save as PDF</button>
+      <a href="/admin/dashboard" class="btn btn-outline">&larr; Back to Admin</a>
+    </div>
+  </div>
+
+  <!-- Final Viva Pitch Callout Box -->
+  <div style="background: #f8fafc; border: 2px solid var(--primary); border-radius: var(--radius-md); padding: 1.5rem; margin-bottom: 2rem;">
+    <h3 style="color: var(--primary); font-size: 1.15rem; font-weight: 800; margin-bottom: 0.5rem; display: flex; align-items: center; gap: 8px;">
+      <span>🎓</span>
+      <span>Official Viva Project Summary (Short & Crisp)</span>
+    </h3>
+    <p style="font-size: 0.95rem; line-height: 1.7; color: #1e293b;">
+      <strong>ClubSphere</strong> is a centralized platform for college clubs. Students can discover clubs, view recruitment and event details, apply online, and track their applications. Club Secretaries and Core Members manage recruitments and events, Faculty Advisors approve activities, and Admin manages the entire system. The platform solves the problem of scattered club information across WhatsApp, Instagram, and notices by providing a single website for all club-related activities. ✅
+    </p>
+  </div>
+
+  <!-- Report Metrics Overview -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-blue">🏛️</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= stats.totalClubs %></div>
+        <div class="stat-title">Total Campus Clubs (<%= stats.activeClubs %> Active)</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-yellow">⚡</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= stats.openRecruitments %></div>
+        <div class="stat-title">Active Recruitment Drives</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-purple">📝</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= stats.totalApplications %></div>
+        <div class="stat-title">Total Applications Received</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-green">🎟️</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= stats.totalRegistrations %></div>
+        <div class="stat-title">Total Event RSVPs (<%= stats.totalEvents %> Events)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detailed Clubs Summary Table -->
+  <div class="card" style="margin-bottom: 2.5rem;">
+    <div class="card-header">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+        1. Clubs & Societies Registry
+      </h3>
+    </div>
+    <div class="card-body" style="padding: 0;">
+      <div class="table-responsive" style="border: none;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Club Name</th>
+              <th>Category</th>
+              <th>Faculty Advisor</th>
+              <th>Student Secretary</th>
+              <th>Recruitment</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% clubs.forEach(c => { %>
+              <tr>
+                <td><strong><%= c.name %> (<%= c.code %>)</strong></td>
+                <td><%= c.category %></td>
+                <td><%= c.facultyAdvisor.name %></td>
+                <td><%= c.secretary.name %></td>
+                <td>
+                  <span class="badge <%= c.recruitmentStatus === 'Open' ? 'badge-open' : 'badge-closed' %>">
+                    <%= c.recruitmentStatus %>
+                  </span>
+                </td>
+                <td><%= c.isActive ? 'Active' : 'Inactive' %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recruitment Drives Summary Table -->
+  <div class="card" style="margin-bottom: 2.5rem;">
+    <div class="card-header">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+        2. Recruitment Drives & Faculty Approvals
+      </h3>
+    </div>
+    <div class="card-body" style="padding: 0;">
+      <div class="table-responsive" style="border: none;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Recruitment Drive</th>
+              <th>Host Club</th>
+              <th>Academic Year</th>
+              <th>Deadline</th>
+              <th>Faculty Approval</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% recruitments.forEach(r => { %>
+              <tr>
+                <td><strong><%= r.title %></strong></td>
+                <td><%= r.club ? r.club.name : 'Club' %></td>
+                <td><%= r.academicYear %></td>
+                <td><%= new Date(r.deadline).toLocaleDateString() %></td>
+                <td>
+                  <span class="badge <%= r.facultyApproval.status === 'Approved' ? 'badge-open' : 'badge-coming-soon' %>">
+                    <%= r.facultyApproval.status %>
+                  </span>
+                </td>
+                <td><%= r.status %></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Events Registration Summary Table -->
+  <div class="card">
+    <div class="card-header">
+      <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+        3. Campus Events & Student Participation
+      </h3>
+    </div>
+    <div class="card-body" style="padding: 0;">
+      <div class="table-responsive" style="border: none;">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Event Title</th>
+              <th>Host Club</th>
+              <th>Category</th>
+              <th>Event Date</th>
+              <th>Venue</th>
+              <th>Students Registered</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% events.forEach(e => { %>
+              <tr>
+                <td><strong><%= e.title %></strong></td>
+                <td><%= e.club ? e.club.name : 'Club' %></td>
+                <td><%= e.category %></td>
+                <td><%= new Date(e.eventDate).toLocaleDateString() %></td>
+                <td><%= e.venue %></td>
+                <td>
+                  <strong><%= e.participants.length %></strong> / <%= e.maxParticipants %>
+                </td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

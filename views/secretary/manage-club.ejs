@@ -1,0 +1,81 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <div style="margin-bottom: 1.5rem;">
+    <a href="/secretary/dashboard" class="btn btn-sm btn-outline">&larr; Back to Dashboard</a>
+  </div>
+
+  <div class="form-card" style="max-width: 800px;">
+    <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--primary);">
+        🏛️ Manage <%= club.name %> Profile
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        Update public details, core objectives, and current recruitment status
+      </p>
+    </div>
+
+    <form action="/secretary/club" method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Club Name</label>
+          <input type="text" class="form-control" value="<%= club.name %>" readonly style="background: #f1f5f9;">
+        </div>
+        <div class="form-group">
+          <label>Club Code / Category</label>
+          <input type="text" class="form-control" value="<%= club.code %> &bull; <%= club.category %>" readonly style="background: #f1f5f9;">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="tagline">Tagline</label>
+        <input type="text" id="tagline" name="tagline" class="form-control" value="<%= club.tagline %>" required>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Detailed Description *</label>
+        <textarea id="description" name="description" class="form-control" style="min-height: 120px;" required><%= club.description %></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="objectives">Objectives & Activities (One per line)</label>
+        <textarea id="objectives" name="objectives" class="form-control" style="min-height: 100px;"><%= club.objectives ? club.objectives.join('\n') : '' %></textarea>
+        <small class="form-text">Enter each objective on a new line to render as bullet points.</small>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="recruitmentStatus">Recruitment Status</label>
+          <select id="recruitmentStatus" name="recruitmentStatus" class="form-control">
+            <option value="Open" <%= club.recruitmentStatus === 'Open' ? 'selected' : '' %>>Open</option>
+            <option value="Closed" <%= club.recruitmentStatus === 'Closed' ? 'selected' : '' %>>Closed</option>
+            <option value="Coming Soon" <%= club.recruitmentStatus === 'Coming Soon' ? 'selected' : '' %>>Coming Soon</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="contactEmail">Official Contact Email</label>
+          <input type="email" id="contactEmail" name="contactEmail" class="form-control" value="<%= club.contactEmail %>">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="instagram">Instagram Handle / URL</label>
+          <input type="text" id="instagram" name="instagram" class="form-control" value="<%= club.instagram %>" placeholder="https://instagram.com/club_handle">
+        </div>
+        <div class="form-group">
+          <label for="linkedin">LinkedIn Page URL</label>
+          <input type="text" id="linkedin" name="linkedin" class="form-control" value="<%= club.linkedin %>" placeholder="https://linkedin.com/company/club_handle">
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+        Save Changes & Update Profile &rarr;
+      </button>
+    </form>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

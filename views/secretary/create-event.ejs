@@ -1,0 +1,84 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <div style="margin-bottom: 1.5rem;">
+    <a href="/secretary/events" class="btn btn-sm btn-outline">&larr; Back to Events</a>
+  </div>
+
+  <div class="form-card" style="max-width: 800px;">
+    <div style="border-bottom: 1px solid var(--border-color); padding-bottom: 1rem; margin-bottom: 1.5rem;">
+      <h1 style="font-size: 1.75rem; font-weight: 800; color: var(--primary);">
+        📅 Create Campus Event for <%= club.name %>
+      </h1>
+      <p style="color: var(--text-muted); font-size: 0.9rem;">
+        Publish an upcoming workshop, hackathon, or competition for college students
+      </p>
+    </div>
+
+    <form action="/secretary/events" method="POST">
+      <div class="form-group">
+        <label for="title">Event Title *</label>
+        <input type="text" id="title" name="title" class="form-control" placeholder="e.g. CodeStorm 2026: 24-Hour Hackathon" required>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="category">Event Category</label>
+          <select id="category" name="category" class="form-control">
+            <option value="Workshop">Workshop / Bootcamp</option>
+            <option value="Hackathon">Hackathon / Coding Sprint</option>
+            <option value="Guest Lecture">Guest Lecture / Tech Talk</option>
+            <option value="Symposium">Technical Symposium</option>
+            <option value="Competition">Competition / Contest</option>
+            <option value="Cultural Fest">Cultural Fest</option>
+            <option value="Sports Meet">Sports Meet</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="venue">Campus Venue *</label>
+          <input type="text" id="venue" name="venue" class="form-control" placeholder="e.g. F-Block CC Lab 3 / Quadrangle" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="eventDate">Event Date *</label>
+          <input type="date" id="eventDate" name="eventDate" class="form-control" required>
+        </div>
+        <div class="form-group">
+          <label for="registrationDeadline">Registration Deadline *</label>
+          <input type="date" id="registrationDeadline" name="registrationDeadline" class="form-control" required>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="startTime">Start Time</label>
+          <input type="text" id="startTime" name="startTime" class="form-control" value="09:30 AM" placeholder="e.g. 09:30 AM">
+        </div>
+        <div class="form-group">
+          <label for="endTime">End Time</label>
+          <input type="text" id="endTime" name="endTime" class="form-control" value="04:30 PM" placeholder="e.g. 04:30 PM">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="maxParticipants">Max Participant Capacity</label>
+        <input type="number" id="maxParticipants" name="maxParticipants" class="form-control" value="100" min="10" max="1000">
+      </div>
+
+      <div class="form-group">
+        <label for="description">Event Description & Agenda *</label>
+        <textarea id="description" name="description" class="form-control" style="min-height: 120px;" placeholder="Provide comprehensive details about topics covered, prerequisites, prizes, and certificates..." required></textarea>
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">
+        Publish Event & Broadcast to Campus &rarr;
+      </button>
+    </form>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

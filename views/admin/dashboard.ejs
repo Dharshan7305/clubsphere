@@ -1,0 +1,136 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container dashboard-wrapper">
+  <div class="section-header">
+    <div>
+      <span class="badge badge-open" style="margin-bottom: 0.25rem;">Administrator</span>
+      <h1 class="section-title">🏛️ Dean of Student Affairs &bull; Admin Center</h1>
+      <p class="section-subtitle">System-wide governance, club administration, user privileges, and viva reports</p>
+    </div>
+    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+      <a href="/admin/clubs" class="btn btn-outline">Manage Clubs</a>
+      <a href="/admin/users" class="btn btn-outline">Manage Users</a>
+      <a href="/admin/reports" class="btn btn-primary">Generate Reports</a>
+    </div>
+  </div>
+
+  <!-- Admin System Stats -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-blue">🏛️</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= stats.totalClubs %></div>
+        <div class="stat-title">Registered Clubs</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-green">🎓</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= stats.totalUsers %></div>
+        <div class="stat-title">Platform Users</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-yellow">⚡</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= stats.totalRecruitments %></div>
+        <div class="stat-title">Recruitment Drives</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-purple">📝</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= stats.totalApplications %></div>
+        <div class="stat-title">Student Applications</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="grid-template-columns: 2fr 1fr; align-items: start;">
+    <!-- Left Column: Recent Applications & Activity -->
+    <div>
+      <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+          <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+            📋 Recent Student Recruitment Applications
+          </h3>
+          <a href="/admin/reports" class="btn btn-sm btn-outline">Full Analytics &rarr;</a>
+        </div>
+        <div class="card-body" style="padding: 0;">
+          <div class="table-responsive" style="border: none; box-shadow: none;">
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Roll No</th>
+                  <th>Club</th>
+                  <th>Role Applied</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% recentApplications.forEach(app => { %>
+                  <tr>
+                    <td><strong><%= app.studentName %></strong></td>
+                    <td><%= app.rollNo %></td>
+                    <td><%= app.club ? app.club.name : 'Club' %></td>
+                    <td><%= app.appliedRole %></td>
+                    <td>
+                      <span class="badge <%= app.status === 'Accepted' ? 'badge-open' : (app.status === 'Shortlisted' ? 'badge-shortlisted' : 'badge-submitted') %>">
+                        <%= app.status %>
+                      </span>
+                    </td>
+                  </tr>
+                <% }) %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Category Distribution & Quick Links -->
+    <div>
+      <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+          <h3 style="font-size: 1rem; font-weight: 700; color: var(--primary);">
+            📊 Clubs by Category
+          </h3>
+        </div>
+        <div class="card-body">
+          <ul style="list-style: none;">
+            <% categoryStats.forEach(cat => { %>
+              <li style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-color); font-size: 0.9rem;">
+                <span><%= cat._id %></span>
+                <span class="badge badge-category"><%= cat.count %> clubs</span>
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3 style="font-size: 1rem; font-weight: 700; color: var(--primary);">
+            ⚡ Quick Admin Actions
+          </h3>
+        </div>
+        <div class="card-body" style="display: flex; flex-direction: column; gap: 0.75rem;">
+          <a href="/admin/clubs" class="btn btn-outline" style="text-align: left; justify-content: flex-start;">
+            ➕ Add / Edit College Clubs
+          </a>
+          <a href="/admin/users" class="btn btn-outline" style="text-align: left; justify-content: flex-start;">
+            👤 Manage Users & Role Privileges
+          </a>
+          <a href="/admin/reports" class="btn btn-primary" style="text-align: left; justify-content: flex-start;">
+            📑 Export Viva Project Reports
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

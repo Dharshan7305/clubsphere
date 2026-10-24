@@ -1,0 +1,200 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container dashboard-wrapper">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">🎓 Student Dashboard</h1>
+      <p class="section-subtitle">Welcome back, <%= user.name %> (<%= user.rollNo || 'ClubSphere' %>) &bull; <%= user.department %></p>
+    </div>
+    <div style="display: flex; gap: 0.5rem;">
+      <a href="/clubs" class="btn btn-outline">Explore Clubs</a>
+      <a href="/events" class="btn btn-primary">Find Events</a>
+    </div>
+  </div>
+
+  <!-- Metric Counters -->
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-blue">📝</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= applications.length %></div>
+        <div class="stat-title">Applications Submitted</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-green">🎉</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= joinedClubs.length %></div>
+        <div class="stat-title">Joined Clubs</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-purple">🎟️</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= registeredEvents.length %></div>
+        <div class="stat-title">Registered Events</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-yellow">⭐</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= savedClubs.length %></div>
+        <div class="stat-title">Saved Clubs</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-3" style="grid-template-columns: 2fr 1fr; align-items: start;">
+    <!-- Left Column: Active Applications & Registered Events -->
+    <div>
+      <!-- My Application Status Preview -->
+      <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+          <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+            📋 My Recruitment Applications
+          </h3>
+          <a href="/student/applications" class="btn btn-sm btn-outline">View Details &rarr;</a>
+        </div>
+        <div class="card-body" style="padding: 0;">
+          <% if (applications.length === 0) { %>
+            <div style="padding: 2rem; text-align: center; color: var(--text-muted);">
+              You haven't applied to any clubs yet. Browse open recruitments below!
+            </div>
+          <% } else { %>
+            <div class="table-responsive" style="border: none; box-shadow: none;">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th>Club</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Date</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% applications.forEach(app => { %>
+                    <tr>
+                      <td>
+                        <strong><%= app.club ? app.club.name : 'Club' %></strong>
+                      </td>
+                      <td><%= app.appliedRole %></td>
+                      <td>
+                        <% if (app.status === 'Submitted') { %>
+                          <span class="badge badge-submitted">Submitted</span>
+                        <% } else if (app.status === 'Under Review') { %>
+                          <span class="badge badge-coming-soon">Under Review</span>
+                        <% } else if (app.status === 'Shortlisted') { %>
+                          <span class="badge badge-shortlisted">Shortlisted</span>
+                        <% } else if (app.status === 'Accepted') { %>
+                          <span class="badge badge-accepted">Accepted</span>
+                        <% } else { %>
+                          <span class="badge badge-rejected">Rejected</span>
+                        <% } %>
+                      </td>
+                      <td style="font-size: 0.8rem; color: var(--text-muted);">
+                        <%= new Date(app.submittedAt).toLocaleDateString() %>
+                      </td>
+                    </tr>
+                  <% }) %>
+                </tbody>
+              </table>
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Registered Events Preview -->
+      <div class="card">
+        <div class="card-header">
+          <h3 style="font-size: 1.1rem; font-weight: 700; color: var(--primary);">
+            🎟️ My Event Registrations
+          </h3>
+          <a href="/events" class="btn btn-sm btn-outline">Discover Events</a>
+        </div>
+        <div class="card-body">
+          <% if (registeredEvents.length === 0) { %>
+            <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center; padding: 1.5rem 0;">
+              You have not registered for any events yet. Check out upcoming campus events!
+            </p>
+          <% } else { %>
+            <% registeredEvents.forEach(evt => { %>
+              <div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 0; border-bottom: 1px solid var(--border-color);">
+                <div>
+                  <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--primary);"><%= evt.title %></h4>
+                  <span style="font-size: 0.8rem; color: var(--text-muted);">
+                    <%= evt.club ? evt.club.name : 'Club' %> &bull; 📍 <%= evt.venue %> &bull; 🕒 <%= new Date(evt.eventDate).toLocaleDateString() %>
+                  </span>
+                </div>
+                <a href="/events/<%= evt._id %>" class="btn btn-sm btn-outline">View Pass</a>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Column: Notifications & Saved Clubs -->
+    <div>
+      <!-- Notifications Module Preview -->
+      <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+          <h3 style="font-size: 1rem; font-weight: 700; color: var(--primary);">
+            🔔 Recent Notifications
+          </h3>
+          <a href="/student/notifications" style="font-size: 0.825rem; font-weight: 600;">View All</a>
+        </div>
+        <div class="card-body" style="padding: 0.75rem;">
+          <% if (notifications.length === 0) { %>
+            <p style="padding: 1rem; text-align: center; color: var(--text-muted); font-size: 0.88rem;">No new notifications</p>
+          <% } else { %>
+            <% notifications.forEach(notif => { %>
+              <div style="padding: 0.75rem; border-bottom: 1px solid var(--border-color); font-size: 0.85rem;">
+                <div style="font-weight: 700; color: var(--primary); margin-bottom: 0.2rem;"><%= notif.title %></div>
+                <div style="color: #475569; font-size: 0.82rem;"><%= notif.message %></div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 0.3rem;">
+                  <%= new Date(notif.createdAt).toLocaleDateString() %>
+                </div>
+              </div>
+            <% }) %>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Saved Clubs Module -->
+      <div class="card">
+        <div class="card-header">
+          <h3 style="font-size: 1rem; font-weight: 700; color: var(--primary);">
+            ⭐ Bookmarked Clubs
+          </h3>
+        </div>
+        <div class="card-body">
+          <% if (savedClubs.length === 0) { %>
+            <p style="font-size: 0.85rem; color: var(--text-muted);">
+              You haven't bookmarked any clubs yet. Click "Save Club" on any club page to keep quick tabs!
+            </p>
+          <% } else { %>
+            <ul style="list-style: none;">
+              <% savedClubs.forEach(club => { %>
+                <li style="padding: 0.5rem 0; border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+                  <div>
+                    <a href="/clubs/<%= club._id %>" style="font-weight: 600; font-size: 0.9rem; color: var(--primary);">
+                      <%= club.name %>
+                    </a>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);"><%= club.category %></div>
+                  </div>
+                  <span class="badge <%= club.recruitmentStatus === 'Open' ? 'badge-open' : 'badge-closed' %>">
+                    <%= club.recruitmentStatus %>
+                  </span>
+                </li>
+              <% }) %>
+            </ul>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,22 @@
+<div class="container alert-container">
+  <% if (typeof success_msg !== 'undefined' && success_msg.length > 0) { %>
+    <div class="alert alert-success">
+      <span>✓ <%= success_msg %></span>
+      <button class="alert-close" onclick="this.parentElement.remove()">✕</button>
+    </div>
+  <% } %>
+
+  <% if (typeof error_msg !== 'undefined' && error_msg.length > 0) { %>
+    <div class="alert alert-danger">
+      <span>⚠ <%= error_msg %></span>
+      <button class="alert-close" onclick="this.parentElement.remove()">✕</button>
+    </div>
+  <% } %>
+
+  <% if (typeof error !== 'undefined' && error.length > 0) { %>
+    <div class="alert alert-danger">
+      <span>⚠ <%= error %></span>
+      <button class="alert-close" onclick="this.parentElement.remove()">✕</button>
+    </div>
+  <% } %>
+</div>

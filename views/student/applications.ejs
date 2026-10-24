@@ -1,0 +1,121 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">📊 Track Application Status</h1>
+      <p class="section-subtitle">Real-time status updates and interview schedules for your club applications</p>
+    </div>
+    <a href="/clubs" class="btn btn-outline">+ Apply to More Clubs</a>
+  </div>
+
+  <% if (applications.length === 0) { %>
+    <div style="text-align: center; padding: 4rem 1rem; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <h3 style="color: var(--primary); font-size: 1.35rem; margin-bottom: 0.5rem;">No applications submitted yet</h3>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Discover college clubs and apply for ongoing recruitment drives.</p>
+      <a href="/clubs" class="btn btn-primary">Discover Clubs &rarr;</a>
+    </div>
+  <% } else { %>
+    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+      <% applications.forEach(app => { %>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <span class="badge badge-category"><%= app.club.category %></span>
+              <h2 style="font-size: 1.3rem; font-weight: 700; color: var(--primary); margin-top: 0.25rem;">
+                <%= app.club.name %>
+              </h2>
+            </div>
+            <div>
+              <% if (app.status === 'Submitted') { %>
+                <span class="badge badge-submitted">Application Submitted</span>
+              <% } else if (app.status === 'Under Review') { %>
+                <span class="badge badge-coming-soon">Under Review</span>
+              <% } else if (app.status === 'Shortlisted') { %>
+                <span class="badge badge-shortlisted">Shortlisted for Interview</span>
+              <% } else if (app.status === 'Accepted') { %>
+                <span class="badge badge-accepted">Accepted / Selected 🎉</span>
+              <% } else { %>
+                <span class="badge badge-rejected">Application Rejected</span>
+              <% } %>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <!-- Status Timeline Tracker -->
+            <div class="status-tracker">
+              <div class="tracker-step <%= ['Submitted', 'Under Review', 'Shortlisted', 'Accepted', 'Rejected'].includes(app.status) ? 'completed' : '' %>">
+                <div class="tracker-dot">✓</div>
+                <div class="tracker-label">Submitted</div>
+              </div>
+              <div class="tracker-step <%= ['Under Review', 'Shortlisted', 'Accepted', 'Rejected'].includes(app.status) ? 'completed' : '' %>">
+                <div class="tracker-dot">2</div>
+                <div class="tracker-label">Under Review</div>
+              </div>
+              <div class="tracker-step <%= ['Shortlisted', 'Accepted'].includes(app.status) ? 'completed' : (app.status === 'Under Review' ? 'active' : '') %>">
+                <div class="tracker-dot">3</div>
+                <div class="tracker-label">Shortlisted</div>
+              </div>
+              <div class="tracker-step <%= app.status === 'Accepted' ? 'completed' : (app.status === 'Rejected' ? 'completed' : '') %>">
+                <div class="tracker-dot">★</div>
+                <div class="tracker-label">Final Decision</div>
+              </div>
+            </div>
+
+            <!-- Application Details Grid -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-top: 1.5rem; background: #f8fafc; padding: 1rem; border-radius: var(--radius-sm); border: 1px solid var(--border-color);">
+              <div>
+                <span style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Applied Role</span>
+                <div style="font-size: 0.95rem; font-weight: 700; color: var(--primary);"><%= app.appliedRole %></div>
+              </div>
+              <div>
+                <span style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Submitted Date</span>
+                <div style="font-size: 0.95rem; font-weight: 600; color: #334155;"><%= new Date(app.submittedAt).toLocaleDateString() %></div>
+              </div>
+              <div>
+                <span style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Recruitment Drive</span>
+                <div style="font-size: 0.95rem; font-weight: 600; color: #334155;"><%= app.recruitment ? app.recruitment.title : 'General Recruitment' %></div>
+              </div>
+            </div>
+
+            <!-- Interview Call Box if Shortlisted -->
+            <% if (app.status === 'Shortlisted' || app.interviewDate) { %>
+              <div style="margin-top: 1.25rem; background: #fffbeb; border: 1px solid #fde68a; border-radius: var(--radius-sm); padding: 1rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 700; color: #92400e; margin-bottom: 0.35rem;">
+                  📅 Interview Scheduled
+                </h4>
+                <div style="font-size: 0.88rem; color: #78350f;">
+                  <div>Date: <strong><%= app.interviewDate ? new Date(app.interviewDate).toLocaleString('en-IN') : 'To be announced' %></strong></div>
+                  <div>Venue: <strong><%= app.interviewVenue || 'Club Room / Lab' %></strong></div>
+                  <% if (app.secretaryNotes) { %>
+                    <div style="margin-top: 0.35rem;">Remarks: <em>"<%= app.secretaryNotes %>"</em></div>
+                  <% } %>
+                </div>
+              </div>
+            <% } %>
+
+            <!-- Secretary Remarks if Available -->
+            <% if (app.secretaryNotes && app.status !== 'Shortlisted') { %>
+              <div style="margin-top: 1rem; font-size: 0.88rem; color: #475569; background: #f1f5f9; padding: 0.75rem 1rem; border-radius: var(--radius-sm);">
+                <strong>Committee Feedback:</strong> "<%= app.secretaryNotes %>"
+              </div>
+            <% } %>
+          </div>
+
+          <div class="card-footer">
+            <span style="font-size: 0.825rem; color: var(--text-muted);">
+              Roll No: <%= app.rollNo %>
+            </span>
+            <a href="/clubs/<%= app.club._id %>" class="btn btn-sm btn-outline">
+              Visit Club Page &rarr;
+            </a>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</main>
+
+<%- include('../partials/footer') %>

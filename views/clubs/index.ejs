@@ -1,0 +1,110 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">🏛️ Club Discovery</h1>
+      <p class="section-subtitle">Explore student organizations, technical societies, and cultural forums</p>
+    </div>
+  </div>
+
+  <!-- Search & Category Filter Module -->
+  <div class="filter-bar">
+    <form action="/clubs" method="GET" style="display: flex; gap: 1rem; width: 100%; flex-wrap: wrap;">
+      <div class="search-input-wrapper">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          name="search" 
+          class="search-input" 
+          placeholder="Search clubs by name, code, or description (e.g., Coding, Robotics, NSS)..." 
+          value="<%= searchQuery %>"
+        >
+      </div>
+
+      <input type="hidden" name="category" value="<%= selectedCategory %>">
+      <button type="submit" class="btn btn-primary">Search</button>
+      <% if (searchQuery || (selectedCategory && selectedCategory !== 'All')) { %>
+        <a href="/clubs" class="btn btn-outline">Clear Filters</a>
+      <% } %>
+    </form>
+
+    <!-- Category Pills -->
+    <div class="category-pills">
+      <% categories.forEach(cat => { %>
+        <a 
+          href="/clubs?category=<%= encodeURIComponent(cat) %><%= searchQuery ? '&search=' + encodeURIComponent(searchQuery) : '' %>" 
+          class="category-pill <%= selectedCategory === cat ? 'active' : '' %>"
+        >
+          <%= cat %>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+
+  <!-- Clubs Grid -->
+  <% if (clubs.length === 0) { %>
+    <div style="text-align: center; padding: 4rem 1rem; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <h3 style="color: var(--primary); font-size: 1.35rem; margin-bottom: 0.5rem;">No clubs found</h3>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Try adjusting your search criteria or category filter.</p>
+      <a href="/clubs" class="btn btn-outline">Show All Clubs</a>
+    </div>
+  <% } else { %>
+    <div class="grid-3">
+      <% clubs.forEach(club => { %>
+        <div class="card">
+          <div class="card-body">
+            <div class="club-card-badge-row">
+              <span class="badge badge-category"><%= club.category %></span>
+              <% if (club.recruitmentStatus === 'Open') { %>
+                <span class="badge badge-open">Recruiting Now</span>
+              <% } else if (club.recruitmentStatus === 'Coming Soon') { %>
+                <span class="badge badge-coming-soon">Coming Soon</span>
+              <% } else { %>
+                <span class="badge badge-closed">Recruitment Closed</span>
+              <% } %>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+              <h2 class="club-card-title"><%= club.name %></h2>
+              <span style="font-size: 0.75rem; font-weight: 700; color: #64748b; background: #f1f5f9; padding: 2px 6px; border-radius: 4px;">
+                <%= club.code %>
+              </span>
+            </div>
+
+            <p class="club-card-tagline"><%= club.tagline %></p>
+
+            <div class="club-meta-item">
+              <span>👨‍🏫 <strong>Advisor:</strong> <%= club.facultyAdvisor.name %></span>
+            </div>
+            <div class="club-meta-item">
+              <span>👤 <strong>Secretary:</strong> <%= club.secretary.name %></span>
+            </div>
+            <div class="club-meta-item">
+              <span>✉️ <%= club.contactEmail %></span>
+            </div>
+          </div>
+
+          <div class="card-footer">
+            <div style="display: flex; gap: 8px;">
+              <% if (user && user.role === 'student') { %>
+                <form action="/clubs/<%= club._id %>/save" method="POST" style="display: inline;">
+                  <button type="submit" class="btn btn-sm <%= savedClubIds.includes(club._id.toString()) ? 'btn-accent' : 'btn-outline' %>" title="Bookmark club">
+                    <%= savedClubIds.includes(club._id.toString()) ? '★ Saved' : '☆ Save' %>
+                  </button>
+                </form>
+              <% } %>
+            </div>
+            <a href="/clubs/<%= club._id %>" class="btn btn-sm btn-primary">
+              View Profile &rarr;
+            </a>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</main>
+
+<%- include('../partials/footer') %>

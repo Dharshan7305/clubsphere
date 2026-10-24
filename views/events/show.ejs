@@ -1,0 +1,127 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <div style="margin-bottom: 1.5rem;">
+    <a href="/events" class="btn btn-sm btn-outline">&larr; Back to All Events</a>
+  </div>
+
+  <div class="grid-3" style="grid-template-columns: 2fr 1fr; align-items: start;">
+    <!-- Event Details -->
+    <div>
+      <div class="card" style="border-top: 4px solid var(--secondary);">
+        <div class="card-body" style="padding: 2rem;">
+          <div style="display: flex; gap: 8px; margin-bottom: 0.75rem;">
+            <span class="badge badge-category"><%= event.category %></span>
+            <span class="badge badge-open"><%= event.status %></span>
+          </div>
+
+          <h1 style="font-size: 2.1rem; font-weight: 800; color: var(--primary); margin-bottom: 0.5rem;">
+            <%= event.title %>
+          </h1>
+          <p style="font-size: 1rem; color: var(--text-muted); margin-bottom: 1.5rem;">
+            Organized by <a href="/clubs/<%= event.club._id %>" style="font-weight: 700;"><%= event.club.name %></a>
+          </p>
+
+          <div style="border-top: 1px solid var(--border-color); border-bottom: 1px solid var(--border-color); padding: 1.25rem 0; margin-bottom: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem;">
+            <div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Date</div>
+              <div style="font-size: 1rem; font-weight: 700; color: var(--primary);">
+                <%= new Date(event.eventDate).toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' }) %>
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Timings</div>
+              <div style="font-size: 1rem; font-weight: 700; color: var(--primary);">
+                <%= event.startTime %> - <%= event.endTime %>
+              </div>
+            </div>
+            <div>
+              <div style="font-size: 0.78rem; color: var(--text-muted); text-transform: uppercase; font-weight: 600;">Venue</div>
+              <div style="font-size: 1rem; font-weight: 700; color: var(--primary);">
+                <%= event.venue %>
+              </div>
+            </div>
+          </div>
+
+          <h3 style="font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem;">
+            About the Event
+          </h3>
+          <p style="font-size: 1rem; line-height: 1.8; color: #334155; white-space: pre-line;">
+            <%= event.description %>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Registration Box / Pass -->
+    <div>
+      <div class="card">
+        <div class="card-header">
+          <h3 style="font-size: 1.05rem; font-weight: 700; color: var(--primary);">Registration Desk</h3>
+        </div>
+        <div class="card-body">
+          <div style="margin-bottom: 1.25rem;">
+            <div style="display: flex; justify-content: space-between; font-size: 0.88rem; margin-bottom: 0.4rem;">
+              <span>Seat Availability</span>
+              <strong><%= event.participants.length %> / <%= event.maxParticipants %></strong>
+            </div>
+            <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
+              <div style="width: <%= Math.min(100, Math.round((event.participants.length / event.maxParticipants) * 100)) %>%; height: 100%; background: var(--secondary);"></div>
+            </div>
+          </div>
+
+          <div style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 1.25rem;">
+            <div>📅 Registration Closes: <strong><%= new Date(event.registrationDeadline).toLocaleDateString() %></strong></div>
+            <div>🎟️ Entry Fee: <strong>Free for College Students</strong></div>
+          </div>
+
+          <% if (isRegistered) { %>
+            <div style="background: var(--success-bg); border: 1px solid #a7f3d0; border-radius: var(--radius-sm); padding: 1rem; text-align: center;">
+              <div style="color: #065f46; font-weight: 700; font-size: 1.05rem; margin-bottom: 0.25rem;">
+                ✓ Registered!
+              </div>
+              <p style="font-size: 0.825rem; color: #047857;">
+                Your seat is confirmed. Please report to <%= event.venue %> with your College ID card.
+              </p>
+            </div>
+          <% } else if (event.participants.length >= event.maxParticipants) { %>
+            <button class="btn btn-outline" style="width: 100%; cursor: not-allowed;" disabled>
+              Registration Full
+            </button>
+          <% } else if (user && user.role === 'student') { %>
+            <form action="/events/<%= event._id %>/register" method="POST">
+              <button type="submit" class="btn btn-primary" style="width: 100%;">
+                Confirm One-Click RSVP &rarr;
+              </button>
+            </form>
+          <% } else if (!user) { %>
+            <a href="/auth/login" class="btn btn-primary" style="width: 100%;">
+              Login to Register
+            </a>
+          <% } else { %>
+            <div style="font-size: 0.85rem; color: var(--text-muted); text-align: center;">
+              Logged in as <%= user.role %>. Students can RSVP to this event.
+            </div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- Organizing Club Quick Info -->
+      <div class="card" style="margin-top: 1.5rem;">
+        <div class="card-header">
+          <h3 style="font-size: 0.95rem; font-weight: 700; color: var(--primary);">Host Club Contact</h3>
+        </div>
+        <div class="card-body" style="font-size: 0.88rem;">
+          <p style="font-weight: 700; color: var(--primary);"><%= event.club.name %></p>
+          <p style="color: var(--text-muted); margin-top: 0.25rem;">Faculty Advisor: <%= event.club.facultyAdvisor.name %></p>
+          <p style="color: var(--text-muted);">Secretary: <%= event.club.secretary.name %></p>
+          <p style="color: var(--text-muted); margin-top: 0.5rem;">✉️ <%= event.club.contactEmail %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>

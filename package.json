@@ -1,0 +1,31 @@
+﻿{
+  "name": "clubsphere-clubsphere",
+  "version": "1.0.0",
+  "description": "ClubSphere - Club Discovery & Recruitment Platform for WAD Project",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js",
+    "seed": "node seed.js"
+  },
+  "keywords": [
+    "clubsphere",
+    "clubsphere",
+    "mongodb",
+    "express",
+    "nodejs",
+    "ejs",
+    "wad"
+  ],
+  "author": "College Student",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-flash": "^0.1.1",
+    "dotenv": "^16.4.7",
+    "ejs": "^3.1.10",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "mongoose": "^8.9.5"
+  }
+}

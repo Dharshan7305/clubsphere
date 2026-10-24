@@ -1,0 +1,286 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container" style="padding-top: 2rem; padding-bottom: 4rem;">
+  <div class="section-header">
+    <div>
+      <h1 class="section-title">👥 Recruitment Applicants Roster</h1>
+      <p class="section-subtitle">Screen candidate applications, schedule interviews, and finalize selections for <%= club.name %></p>
+    </div>
+    <div style="font-size: 0.9rem; font-weight: 700; color: var(--primary);">
+      Total: <%= applications.length %> Candidates
+    </div>
+  </div>
+
+  <!-- Filter Bar -->
+  <div class="filter-bar">
+    <form action="/secretary/applications" method="GET" style="display: flex; gap: 1rem; width: 100%; flex-wrap: wrap;">
+      <div class="search-input-wrapper" style="flex: 2;">
+        <span class="search-icon">🔍</span>
+        <input 
+          type="text" 
+          name="search" 
+          class="search-input" 
+          placeholder="Search by student name, roll no, department, or skills..." 
+          value="<%= searchQuery %>"
+        >
+      </div>
+
+      <div style="flex: 1; min-width: 150px;">
+        <select name="status" class="form-control" onchange="this.form.submit()">
+          <option value="All">All Statuses</option>
+          <option value="Submitted" <%= selectedStatus === 'Submitted' ? 'selected' : '' %>>Submitted</option>
+          <option value="Under Review" <%= selectedStatus === 'Under Review' ? 'selected' : '' %>>Under Review</option>
+          <option value="Shortlisted" <%= selectedStatus === 'Shortlisted' ? 'selected' : '' %>>Shortlisted</option>
+          <option value="Accepted" <%= selectedStatus === 'Accepted' ? 'selected' : '' %>>Accepted</option>
+          <option value="Rejected" <%= selectedStatus === 'Rejected' ? 'selected' : '' %>>Rejected</option>
+        </select>
+      </div>
+
+      <div style="flex: 1; min-width: 150px;">
+        <select name="role" class="form-control" onchange="this.form.submit()">
+          <option value="All">All Roles</option>
+          <% distinctRoles.forEach(r => { %>
+            <option value="<%= r %>" <%= selectedRole === r ? 'selected' : '' %>><%= r %></option>
+          <% }) %>
+        </select>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Filter</button>
+      <% if (searchQuery || selectedStatus !== 'All' || selectedRole !== 'All') { %>
+        <a href="/secretary/applications" class="btn btn-outline">Clear</a>
+      <% } %>
+    </form>
+  </div>
+
+  <!-- Applicants Table -->
+  <% if (applications.length === 0) { %>
+    <div style="text-align: center; padding: 4rem 1rem; background: #fff; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <h3 style="color: var(--primary); font-size: 1.35rem; margin-bottom: 0.5rem;">No applicants matching criteria</h3>
+      <p style="color: var(--text-muted); margin-bottom: 1.5rem;">Check back or clear filter options.</p>
+      <a href="/secretary/applications" class="btn btn-outline">Show All</a>
+    </div>
+  <% } else { %>
+    <div class="table-responsive">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Candidate</th>
+            <th>Roll No & Dept</th>
+            <th>Role Applied</th>
+            <th>CGPA</th>
+            <th>Skills</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% applications.forEach(app => { %>
+            <tr>
+              <td>
+                <strong style="color: var(--primary); font-size: 0.95rem;"><%= app.studentName %></strong>
+                <div style="font-size: 0.78rem; color: var(--text-muted);">✉️ <%= app.email %></div>
+              </td>
+              <td>
+                <strong><%= app.rollNo %></strong>
+                <div style="font-size: 0.78rem; color: var(--text-muted);"><%= app.department %> (Yr <%= app.year %>)</div>
+              </td>
+              <td>
+                <span style="font-weight: 600; color: var(--text-dark);"><%= app.appliedRole %></span>
+              </td>
+              <td>
+                <strong style="color: #047857;"><%= app.cgpa || 'N/A' %></strong>
+              </td>
+              <td style="max-width: 200px; font-size: 0.825rem; color: #475569;">
+                <%= app.skills.length > 50 ? app.skills.substring(0, 50) + '...' : app.skills %>
+              </td>
+              <td>
+                <% if (app.status === 'Submitted') { %>
+                  <span class="badge badge-submitted">Submitted</span>
+                <% } else if (app.status === 'Under Review') { %>
+                  <span class="badge badge-coming-soon">Under Review</span>
+                <% } else if (app.status === 'Shortlisted') { %>
+                  <span class="badge badge-shortlisted">Shortlisted</span>
+                <% } else if (app.status === 'Accepted') { %>
+                  <span class="badge badge-accepted">Accepted</span>
+                <% } else { %>
+                  <span class="badge badge-rejected">Rejected</span>
+                <% } %>
+              </td>
+              <td>
+                <button 
+                  type="button" 
+                  class="btn btn-sm btn-primary"
+                  onclick="openApplicantModal(
+                    '<%= app._id %>',
+                    '<%= app.studentName.replace(/'/g, \"\\'\") %>',
+                    '<%= app.rollNo %>',
+                    '<%= app.department.replace(/'/g, \"\\'\") %>',
+                    '<%= app.year %>',
+                    '<%= app.appliedRole.replace(/'/g, \"\\'\") %>',
+                    '<%= app.cgpa %>',
+                    '<%= app.phone %>',
+                    '<%= app.email %>',
+                    '<%= app.skills.replace(/'/g, \"\\'\").replace(/\n/g, \" \") %>',
+                    '<%= app.priorExperience ? app.priorExperience.replace(/'/g, \"\\'\").replace(/\n/g, \" \") : \"\" %>',
+                    '<%= app.whyJoin.replace(/'/g, \"\\'\").replace(/\n/g, \" \") %>',
+                    '<%= app.portfolioLink || \"\" %>',
+                    '<%= app.status %>',
+                    '<%= app.interviewDate ? app.interviewDate.toISOString().substring(0,16) : \"\" %>',
+                    '<%= app.interviewVenue ? app.interviewVenue.replace(/'/g, \"\\'\") : \"\" %>',
+                    '<%= app.secretaryNotes ? app.secretaryNotes.replace(/'/g, \"\\'\") : \"\" %>'
+                  )"
+                >
+                  Review
+                </button>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } %>
+
+  <!-- Modal: Applicant Review & Status Decision -->
+  <div class="modal-overlay" id="applicantReviewModal">
+    <div class="modal-box" style="max-width: 750px;">
+      <div class="modal-header">
+        <h3 class="modal-title" id="mCandidateName">Applicant Review</h3>
+        <button class="modal-close" onclick="closeModal('applicantReviewModal')">✕</button>
+      </div>
+
+      <form id="applicantStatusForm" method="POST">
+        <div class="modal-body">
+          <!-- Candidate Brief Profile -->
+          <div style="background: #f8fafc; border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1rem; margin-bottom: 1.25rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem; font-size: 0.85rem;">
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Roll Number</span>
+              <div id="mRollNo" style="font-weight: 700; color: var(--primary);"></div>
+            </div>
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Dept & Year</span>
+              <div id="mDeptYear" style="font-weight: 600;"></div>
+            </div>
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">CGPA</span>
+              <div id="mCgpa" style="font-weight: 700; color: #047857;"></div>
+            </div>
+            <div>
+              <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">Contact</span>
+              <div id="mContact" style="font-size: 0.8rem;"></div>
+            </div>
+          </div>
+
+          <!-- Application Answers -->
+          <div style="margin-bottom: 1rem;">
+            <strong style="font-size: 0.85rem; color: var(--primary);">Target Role:</strong>
+            <span id="mRole" style="font-weight: 700; margin-left: 6px;"></span>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <strong style="font-size: 0.85rem; color: var(--primary);">Skills & Competencies:</strong>
+            <p id="mSkills" style="font-size: 0.9rem; color: #334155; margin-top: 0.2rem; background: #fafafa; padding: 0.5rem; border-radius: 4px; border: 1px solid #e2e8f0;"></p>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <strong style="font-size: 0.85rem; color: var(--primary);">Prior Experience / Projects:</strong>
+            <p id="mExperience" style="font-size: 0.9rem; color: #334155; margin-top: 0.2rem; background: #fafafa; padding: 0.5rem; border-radius: 4px; border: 1px solid #e2e8f0;"></p>
+          </div>
+
+          <div style="margin-bottom: 1rem;">
+            <strong style="font-size: 0.85rem; color: var(--primary);">Statement of Purpose (Why Join?):</strong>
+            <p id="mWhyJoin" style="font-size: 0.9rem; color: #334155; margin-top: 0.2rem; background: #fafafa; padding: 0.5rem; border-radius: 4px; border: 1px solid #e2e8f0;"></p>
+          </div>
+
+          <div style="margin-bottom: 1.5rem;" id="mPortfolioRow">
+            <strong style="font-size: 0.85rem; color: var(--primary);">Portfolio / GitHub:</strong>
+            <a id="mPortfolio" href="#" target="_blank" style="margin-left: 6px; font-size: 0.88rem;"></a>
+          </div>
+
+          <!-- Decision & Status Form Controls -->
+          <div style="border-top: 2px solid var(--border-color); padding-top: 1.25rem;">
+            <h4 style="font-size: 0.95rem; font-weight: 700; color: var(--primary); margin-bottom: 0.75rem;">
+              Decision & Status Update
+            </h4>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="statusSelect">Application Status *</label>
+                <select id="statusSelect" name="status" class="form-control" required onchange="handleStatusChange(this.value)">
+                  <option value="Submitted">Submitted</option>
+                  <option value="Under Review">Under Review</option>
+                  <option value="Shortlisted">Shortlisted for Interview</option>
+                  <option value="Accepted">Accepted / Selected</option>
+                  <option value="Rejected">Rejected</option>
+                </select>
+              </div>
+
+              <div class="form-group" id="interviewDateGroup">
+                <label for="interviewDate">Interview Date & Time</label>
+                <input type="datetime-local" id="interviewDate" name="interviewDate" class="form-control">
+              </div>
+            </div>
+
+            <div class="form-group" id="interviewVenueGroup">
+              <label for="interviewVenue">Interview Venue / Lab</label>
+              <input type="text" id="interviewVenue" name="interviewVenue" class="form-control" placeholder="e.g. CC Lab 2 / F-Block 3rd Floor">
+            </div>
+
+            <div class="form-group">
+              <label for="secretaryNotes">Committee Remarks / Feedback for Student</label>
+              <textarea id="secretaryNotes" name="secretaryNotes" class="form-control" placeholder="Optional notes visible to student..."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeModal('applicantReviewModal')">Cancel</button>
+          <button type="submit" class="btn btn-primary">Save Decision & Send Notification &rarr;</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</main>
+
+<script>
+function openApplicantModal(id, name, rollNo, dept, year, role, cgpa, phone, email, skills, experience, whyJoin, portfolio, status, interviewDate, interviewVenue, notes) {
+  document.getElementById('applicantStatusForm').action = `/secretary/applications/${id}/status`;
+  document.getElementById('mCandidateName').innerText = `Review: ${name}`;
+  document.getElementById('mRollNo').innerText = rollNo;
+  document.getElementById('mDeptYear').innerText = `${dept} (${year} Year)`;
+  document.getElementById('mCgpa').innerText = cgpa || 'N/A';
+  document.getElementById('mContact').innerText = `${phone} | ${email}`;
+  document.getElementById('mRole').innerText = role;
+  document.getElementById('mSkills').innerText = skills;
+  document.getElementById('mExperience').innerText = experience || 'None provided';
+  document.getElementById('mWhyJoin').innerText = whyJoin;
+
+  const portEl = document.getElementById('mPortfolio');
+  if (portfolio && portfolio.trim() !== '') {
+    portEl.innerText = portfolio;
+    portEl.href = portfolio;
+    document.getElementById('mPortfolioRow').style.display = 'block';
+  } else {
+    document.getElementById('mPortfolioRow').style.display = 'none';
+  }
+
+  document.getElementById('statusSelect').value = status;
+  document.getElementById('interviewDate').value = interviewDate || '';
+  document.getElementById('interviewVenue').value = interviewVenue || '';
+  document.getElementById('secretaryNotes').value = notes || '';
+
+  openModal('applicantReviewModal');
+}
+
+function handleStatusChange(val) {
+  const dateGroup = document.getElementById('interviewDateGroup');
+  const venueGroup = document.getElementById('interviewVenueGroup');
+  if (val === 'Shortlisted') {
+    dateGroup.style.display = 'block';
+    venueGroup.style.display = 'block';
+  }
+}
+</script>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,159 @@
+﻿<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/alerts') %>
+
+<main class="container dashboard-wrapper">
+  <div class="section-header">
+    <div>
+      <span class="badge badge-category" style="margin-bottom: 0.25rem;"><%= club.category %></span>
+      <h1 class="section-title">👨‍🏫 Faculty Advisor Portal</h1>
+      <p class="section-subtitle">Logged in as <%= user.name %> &bull; Faculty Advisor for <%= club.name %></p>
+    </div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-yellow">⏳</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= pendingRecruitments.length %></div>
+        <div class="stat-title">Pending Recruitment Approvals</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-blue">⚡</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= allRecruitments.length %></div>
+        <div class="stat-title">Total Recruitment Drives</div>
+      </div>
+    </div>
+    <div class="stat-box">
+      <div class="stat-icon stat-icon-green">📅</div>
+      <div class="stat-info">
+        <div class="stat-value"><%= events.length %></div>
+        <div class="stat-title">Scheduled Campus Events</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pending Approvals Section (Viva Key Feature!) -->
+  <div class="card" style="margin-bottom: 2rem; border-top: 4px solid var(--accent);">
+    <div class="card-header" style="background: #fffbeb;">
+      <div>
+        <h3 style="font-size: 1.15rem; font-weight: 700; color: #92400e;">
+          ⚠️ Recruitment Drives Awaiting Faculty Approval
+        </h3>
+        <p style="font-size: 0.85rem; color: #b45309;">
+          As per college club bylaws, recruitment announcements must receive faculty approval before opening to students
+        </p>
+      </div>
+      <span class="badge badge-shortlisted"><%= pendingRecruitments.length %> Pending</span>
+    </div>
+
+    <div class="card-body">
+      <% if (pendingRecruitments.length === 0) { %>
+        <p style="color: var(--text-muted); text-align: center; padding: 1.5rem 0;">
+          ✓ All recruitment announcements have been reviewed. No pending requests.
+        </p>
+      <% } else { %>
+        <% pendingRecruitments.forEach(rec => { %>
+          <div style="border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 1.25rem; margin-bottom: 1rem; background: #ffffff;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 0.5rem;">
+              <div>
+                <h4 style="font-size: 1.2rem; font-weight: 700; color: var(--primary); margin-bottom: 0.25rem;">
+                  <%= rec.title %>
+                </h4>
+                <p style="font-size: 0.88rem; color: var(--text-muted);">
+                  Academic Year: <%= rec.academicYear %> &bull; Eligibility: <%= rec.eligibility %> &bull; Deadline: <%= new Date(rec.deadline).toLocaleDateString() %>
+                </p>
+              </div>
+              <span class="badge badge-coming-soon">Pending Faculty Approval</span>
+            </div>
+
+            <div style="margin: 0.85rem 0;">
+              <strong style="font-size: 0.825rem; color: var(--text-muted); text-transform: uppercase;">Proposed Roles:</strong>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap; margin-top: 0.35rem;">
+                <% rec.roles.forEach(role => { %>
+                  <span style="background: #f1f5f9; padding: 3px 8px; border-radius: 4px; font-size: 0.825rem;">
+                    <%= role.roleName %> (<%= role.vacancies %> seats)
+                  </span>
+                <% }) %>
+              </div>
+            </div>
+
+            <!-- Approval / Rejection Form -->
+            <form action="/faculty/recruitments/<%= rec._id %>/review" method="POST" style="border-top: 1px solid var(--border-color); padding-top: 0.85rem; margin-top: 0.85rem;">
+              <div class="form-group" style="margin-bottom: 0.75rem;">
+                <label for="remarks_<%= rec._id %>">Faculty Remarks / Comments *</label>
+                <input 
+                  type="text" 
+                  id="remarks_<%= rec._id %>" 
+                  name="remarks" 
+                  class="form-control" 
+                  placeholder="e.g. Approved. Drive aligns with academic semester calendar." 
+                  value="Approved by Faculty Advisor. Best wishes for recruitment." 
+                  required
+                >
+              </div>
+
+              <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button type="submit" name="action" value="reject" class="btn btn-sm btn-danger">
+                  Request Revision / Reject
+                </button>
+                <button type="submit" name="action" value="approve" class="btn btn-sm btn-success">
+                  ✓ Approve & Publish Drive to Students
+                </button>
+              </div>
+            </form>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Club Events Overview -->
+  <div class="card">
+    <div class="card-header">
+      <h3 style="font-size: 1.15rem; font-weight: 700; color: var(--primary);">
+        📅 Club Activities & Events Monitoring
+      </h3>
+    </div>
+    <div class="card-body" style="padding: 0;">
+      <% if (events.length === 0) { %>
+        <p style="padding: 2rem; text-align: center; color: var(--text-muted);">No club events registered yet.</p>
+      <% } else { %>
+        <div class="table-responsive" style="border: none; box-shadow: none;">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>Event Title</th>
+                <th>Category</th>
+                <th>Date & Time</th>
+                <th>Venue</th>
+                <th>Registered Students</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% events.forEach(evt => { %>
+                <tr>
+                  <td>
+                    <strong style="color: var(--primary);"><%= evt.title %></strong>
+                  </td>
+                  <td><span class="badge badge-category"><%= evt.category %></span></td>
+                  <td style="font-size: 0.85rem;"><%= new Date(evt.eventDate).toLocaleDateString() %> (<%= evt.startTime %>)</td>
+                  <td><%= evt.venue %></td>
+                  <td><strong><%= evt.participants.length %></strong> / <%= evt.maxParticipants %></td>
+                  <td>
+                    <span class="badge <%= evt.status === 'Upcoming' ? 'badge-open' : 'badge-closed' %>"><%= evt.status %></span>
+                  </td>
+                </tr>
+              <% }) %>
+            </tbody>
+          </table>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<%- include('../partials/footer') %>
